@@ -1,0 +1,56 @@
+{
+  "rows": [
+    {
+      "category": "Movies",
+      "kind": "movie",
+      "titles": [
+        "Avengers: Endgame",
+        "Spider-Man: Homecoming",
+        "Spider-Man: Into the Spider-Verse",
+        "Interstellar",
+        "Inception",
+        "Project Hail Mary",
+        "Green Book"
+      ]
+    },
+    {
+      "category": "Shows",
+      "kind": "tv",
+      "titles": [
+        "Breaking Bad",
+        "Game of Thrones",
+        "Ted Lasso",
+        "Suits",
+        "The Flash",
+        "The 100",
+        "The Boys",
+        "The Pitt",
+        "The Office"
+      ]
+    },
+    {
+      "category": "Anime",
+      "kind": "tv",
+      "titles": [
+        "Attack on Titan",
+        "Hunter x Hunter",
+        "Jujutsu Kaisen",
+        "Demon Slayer",
+        "Solo Leveling",
+        "My Hero Academia",
+        { "title": "Seven Deadly Sins", "query": "The Seven Deadly Sins" },
+        "Death Note",
+        "Cyberpunk: Edgerunners",
+        "Code Geass",
+        "Gachiakuta"
+      ]
+    },
+    {
+      "category": "Books",
+      "kind": "book",
+      "titles": [
+        "Project Hail Mary"
+      ]
+    }
+  ]
+}

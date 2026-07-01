@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ethan Miclat</title>
+  <script>document.documentElement.classList.add('js');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Persistent menu button (stays put while content scrolls over the hero) -->
+  <button class="menu-btn" type="button" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- ============ HERO (sticky — stays still on first scroll) ============ -->
+  <section class="hero" id="home">
+    <div class="hero__bg" role="img" aria-label="Ethan Miclat watching a rainbow over the sea"></div>
+    <div class="hero__overlay"></div>
+
+    <header class="topbar">
+      <a class="brandmark" href="#home" aria-label="Ethan Miclat — home">Ethan Miclat</a>
+    </header>
+
+    <div class="hero__center">
+      <h1 class="hero__title">All About Me</h1>
+      <a class="pill pill--cream" href="#projects">
+        View My Work
+        <svg class="pill__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 7h11M9 12h11M9 17h11M4.5 7h.01M4.5 12h.01M4.5 17h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </a>
+    </div>
+
+    <footer class="hero__footer">
+      <span class="scroll-cue">scroll</span>
+      <a class="pill pill--dark contact-pill" href="#contact">Contact Me</a>
+    </footer>
+  </section>
+
+  <!-- ============ CONTENT (scrolls up and takes over the hero) ============ -->
+  <main class="content">
+    <!-- ABOUT -->
+    <section class="section about" id="about">
+      <div class="container about__grid">
+        <div class="about__left stagger">
+          <div class="portrait" role="img" aria-label="Senior portrait of Ethan Miclat"></div>
+
+          <div class="card">
+            <h3 class="card__title">Philosophy</h3>
+            <ul class="values">
+              <li class="value">
+                <span class="value__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.5"/><path d="M5 21a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <div>
+                  <h4 class="value__title">Family-Driven</h4>
+                  <p class="value__text">Everything I pursue is grounded in my family and the people who shaped me.</p>
+                </div>
+              </li>
+              <li class="value">
+                <span class="value__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M12 3 14.5 9 21 9.5 16 14l1.5 6.5L12 17l-5.5 3.5L8 14 3 9.5 9.5 9 12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                </span>
+                <div>
+                  <h4 class="value__title">Dream Big</h4>
+                  <p class="value__text">I aim high and chase goals bigger than myself.</p>
+                </div>
+              </li>
+              <li class="value">
+                <span class="value__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-7-9.3A3.7 3.7 0 0 1 12 7a3.7 3.7 0 0 1 7 3.7C19 15.6 12 20 12 20Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                </span>
+                <div>
+                  <h4 class="value__title">Genuine &amp; Good</h4>
+                  <p class="value__text">I lead with positivity, honesty, and kindness in everything I do.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="about__right stagger">
+          <p class="eyebrow">About Me</p>
+          <h2 class="section__title">A family-driven student who <span class="ital">dreams big</span></h2>
+          <p class="lede">
+            I&rsquo;m Ethan Miclat, a student at the University of Arkansas&rsquo;s Walton Honors
+            College of Business &mdash; on the Business&nbsp;Finance track and pre-dental path.
+          </p>
+          <p class="body-text" data-placeholder>
+            [Editable: add a few sentences about your story &mdash; what drew you to finance and
+            dentistry, what motivates you, and what you want people to know about you.]
+          </p>
+
+          <div class="timeline">
+            <h3 class="timeline__label">The Journey</h3>
+            <ol class="timeline__list">
+              <li class="timeline__item">
+                <span class="timeline__dot timeline__dot--active" aria-hidden="true"></span>
+                <span class="timeline__time">Now</span>
+                <h4 class="timeline__title">University of Arkansas &mdash; Walton Honors College of Business</h4>
+                <p class="timeline__text">Business&nbsp;Finance track, pursuing a pre-dental path.</p>
+              </li>
+              <li class="timeline__item" data-placeholder>
+                <span class="timeline__dot" aria-hidden="true"></span>
+                <span class="timeline__time">[Year]</span>
+                <h4 class="timeline__title">[Add a milestone]</h4>
+                <p class="timeline__text">[e.g. a graduation, award, job, leadership role, or volunteer experience.]</p>
+              </li>
+              <li class="timeline__item" data-placeholder>
+                <span class="timeline__dot" aria-hidden="true"></span>
+                <span class="timeline__time">[Year]</span>
+                <h4 class="timeline__title">[Add a milestone]</h4>
+                <p class="timeline__text">[Where your story began.]</p>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOBBIES -->
+    <section class="section section--alt hobbies" id="hobbies">
+      <div class="container">
+        <div class="section__head stagger">
+          <p class="eyebrow">Interests &amp; Pursuits</p>
+          <h2 class="section__title section__title--center ital">The things that move me</h2>
+        </div>
+
+        <div class="hobby-grid">
+          <!-- Each card opens a dedicated detail view (see .hobby-detail panels) -->
+          <button class="hobby-card hobby-card--lg reveal" type="button" data-hobby="music" aria-haspopup="dialog" aria-label="Open Music">
+            <div class="hobby-card__media"></div>
+            <div class="hobby-card__body">
+              <span class="hobby-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M9 18V6l12-2v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
+              </span>
+              <h3 class="hobby-card__title ital">Music</h3>
+              <p class="hobby-card__text">Step into the sound.</p>
+              <span class="hobby-card__cta">Explore
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </div>
+          </button>
+
+          <button class="hobby-card reveal" type="button" data-hobby="sports" aria-haspopup="dialog" aria-label="Open Sports">
+            <div class="hobby-card__media"></div>
+            <div class="hobby-card__body">
+              <span class="hobby-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <h3 class="hobby-card__title ital">Sports</h3>
+              <p class="hobby-card__text">Game on.</p>
+              <span class="hobby-card__cta">Explore
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </div>
+          </button>
+
+          <button class="hobby-card reveal" type="button" data-hobby="games" aria-haspopup="dialog" aria-label="Open Video Games">
+            <div class="hobby-card__media"></div>
+            <div class="hobby-card__body">
+              <span class="hobby-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="12" rx="5" stroke="currentColor" stroke-width="1.6"/><path d="M6 12h4M8 10v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.5" cy="11" r="1" fill="currentColor"/><circle cx="17.5" cy="13.5" r="1" fill="currentColor"/></svg>
+              </span>
+              <h3 class="hobby-card__title ital">Video Games</h3>
+              <p class="hobby-card__text">Press start.</p>
+              <span class="hobby-card__cta">Explore
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </div>
+          </button>
+
+          <button class="hobby-card hobby-card--lg reveal" type="button" data-hobby="dev" aria-haspopup="dialog" aria-label="Open Software and App Development">
+            <div class="hobby-card__media"></div>
+            <div class="hobby-card__body">
+              <span class="hobby-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M8 9l-3 3 3 3M16 9l3 3-3 3M13.5 7l-3 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <h3 class="hobby-card__title ital">Software / App Development</h3>
+              <p class="hobby-card__text">From idea to app.</p>
+              <span class="hobby-card__cta">Explore
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </div>
+          </button>
+        </div>
+
+        <div class="quote-block reveal">
+          <span class="quote-rule" aria-hidden="true"></span>
+          <p class="quote-text">&ldquo;Dream big, stay genuine, and be a good person.&rdquo;</p>
+          <span class="quote-rule" aria-hidden="true"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS / WORK (second to last) -->
+    <section class="section projects" id="projects">
+      <div class="container">
+        <div class="section__head section__head--left stagger">
+          <p class="eyebrow">Selected Works</p>
+          <h2 class="projects__headline">Projects</h2>
+        </div>
+
+        <div class="projects__list">
+          <!-- Featured: Rebel Hauling (live site) -->
+          <article class="proj-featured reveal">
+            <div class="proj-media proj-media--16x9">
+              <video class="proj-media__video" autoplay muted loop playsinline preload="metadata" poster="assets/rebel-hauling-poster.jpg">
+                <source src="assets/rebel-hauling.mp4" type="video/mp4" />
+              </video>
+            </div>
+            <div class="proj-featured__info">
+              <span class="proj__meta">Website</span>
+              <h3 class="proj__title">Rebel Hauling</h3>
+              <p class="proj__desc">Built and deployed a website for a hauling business.</p>
+              <a class="proj__link" href="https://rebelhauling.com" target="_blank" rel="noopener">
+                Visit Site
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Staggered pair -->
+          <div class="proj-pair">
+            <article class="proj-card proj-card--offset reveal" data-placeholder>
+              <div class="proj-media proj-media--4x5"><div class="proj-media__img"></div></div>
+              <span class="proj__meta">[Category / Year]</span>
+              <h3 class="proj__title">[Project name]</h3>
+              <p class="proj__desc">[Short description.]</p>
+              <a class="proj__link-underline" href="#">View Project</a>
+            </article>
+            <article class="proj-card reveal" data-placeholder>
+              <div class="proj-media proj-media--4x5"><div class="proj-media__img"></div></div>
+              <span class="proj__meta">[Category / Year]</span>
+              <h3 class="proj__title">[Project name]</h3>
+              <p class="proj__desc">[Short description.]</p>
+              <a class="proj__link-underline" href="#">View Project</a>
+            </article>
+          </div>
+
+          <!-- Full-width narrative -->
+          <article class="proj-wide reveal" data-placeholder>
+            <div class="proj-media proj-media--21x9"><div class="proj-media__img"></div></div>
+            <div class="proj-wide__info">
+              <span class="proj__meta">[Category / Year]</span>
+              <h3 class="proj__title proj__title--lg">[Project name]</h3>
+              <p class="proj__desc">[A longer description for your flagship project.]</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="projects__actions reveal">
+          <a class="pill pill--cream" href="#" data-link="github">
+            <svg class="pill__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1.5a10.5 10.5 0 0 0-3.32 20.46c.52.1.71-.23.71-.5l-.01-1.76c-2.92.64-3.54-1.4-3.54-1.4-.48-1.22-1.17-1.54-1.17-1.54-.95-.65.07-.64.07-.64 1.06.08 1.61 1.09 1.61 1.09.94 1.6 2.46 1.14 3.06.87.1-.68.37-1.14.67-1.4-2.33-.27-4.78-1.17-4.78-5.18 0-1.15.41-2.08 1.08-2.82-.11-.27-.47-1.34.1-2.78 0 0 .88-.28 2.88 1.07a9.96 9.96 0 0 1 5.24 0c2-1.35 2.88-1.07 2.88-1.07.57 1.44.21 2.51.1 2.78.67.74 1.08 1.67 1.08 2.82 0 4.02-2.46 4.9-4.8 5.16.38.33.71.97.71 1.96l-.01 2.9c0 .28.19.61.72.5A10.5 10.5 0 0 0 12 1.5Z"/></svg>
+            GitHub
+          </a>
+          <a class="pill pill--ghost" href="#" data-link="resume">
+            <svg class="pill__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 3v5h5M9 13h6M9 17h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            Résumé
+          </a>
+        </div>
+
+        <div class="projects__cta reveal">
+          <h3 class="projects__cta-title">Interested in connecting?</h3>
+          <p class="projects__cta-text">I&rsquo;m always open to new opportunities, ideas, and conversations.</p>
+          <a class="pill pill--cream" href="#contact">
+            Contact Me
+            <svg class="pill__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT (last) -->
+    <section class="section section--alt contact" id="contact">
+      <div class="container">
+        <div class="contact__grid">
+          <!-- Left: headline + socials -->
+          <div class="contact__intro stagger">
+            <p class="eyebrow">Get in touch</p>
+            <h2 class="contact__title">Let&rsquo;s <span class="ital">Connect</span></h2>
+            <p class="lede">
+              Whether you have a question, an opportunity, or just want to say hello &mdash;
+              I&rsquo;m always open to a good conversation.
+            </p>
+            <div class="contact__socials">
+              <a class="contact__social" href="#" data-link="linkedin" data-placeholder>
+                LinkedIn
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+              <a class="contact__social" href="#" data-link="github" data-placeholder>
+                GitHub
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+              <a class="contact__social" href="#" data-link="instagram" data-placeholder>
+                Instagram
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Right: glass form -->
+          <div class="contact__formwrap reveal">
+            <form class="contact__form" id="contactForm" novalidate>
+              <div class="field">
+                <label for="cf-name">Name</label>
+                <input id="cf-name" name="name" type="text" autocomplete="name" placeholder="Your name" />
+              </div>
+              <div class="field">
+                <label for="cf-email">Email</label>
+                <input id="cf-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" />
+              </div>
+              <div class="field">
+                <label for="cf-message">Message</label>
+                <textarea id="cf-message" name="message" rows="4" placeholder="Say hello&hellip;"></textarea>
+              </div>
+              <div class="contact__submit">
+                <button class="pill pill--cream" type="submit">
+                  Send Message
+                  <svg class="pill__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOCATION -->
+    <section class="section location" id="location">
+      <div class="container location__grid">
+        <div class="location__info stagger">
+          <span class="eyebrow">Location</span>
+          <h3 class="location__title">Based in Fayetteville, Arkansas</h3>
+          <p class="body-text">
+            Studying at the University of Arkansas &mdash; open to opportunities and always happy to connect.
+          </p>
+          <div class="location__lines">
+            <div class="location__line">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.6"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <a class="link-underline" href="mailto:ethanmic6@gmail.com">ethanmic6@gmail.com</a>
+            </div>
+            <div class="location__line">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Local time: <span class="location__time" id="current-time">&mdash;</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Placeholder media — swap for a campus / Fayetteville photo -->
+        <div class="location__media reveal">
+          <div class="location__photo"></div>
+          <span class="location__coords">36.0764&deg; N, 94.2088&deg; W</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="container site-footer__inner">
+        <a class="site-footer__brand" href="#home">Ethan Miclat</a>
+        <nav class="site-footer__nav" aria-label="Footer">
+          <a href="#about">About</a>
+          <a href="#hobbies">Hobbies</a>
+          <a href="#projects">Projects</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <p class="site-footer__copy">&copy; 2026 Ethan Miclat</p>
+      </div>
+    </footer>
+  </main>
+
+  <!-- ============ HOBBY DETAIL VIEWS ============ -->
+  <!-- Off-canvas full-screen panels. NOT part of the scroll flow — only reachable -->
+  <!-- by clicking a hobby card. Close with the Back button or Escape. -->
+
+  <!-- MUSIC -->
+  <section class="hobby-detail" id="hobby-music" role="dialog" aria-modal="true" aria-labelledby="hobby-music-title" hidden>
+    <div class="hobby-detail__bar">
+      <button class="hobby-detail__back" type="button" data-hobby-close>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back
+      </button>
+      <span class="hobby-detail__crumb">Hobbies / Music</span>
+    </div>
+    <div class="hobby-detail__scroll" data-lenis-prevent>
+      <div class="container hobby-detail__inner">
+        <span class="hobby-detail__kicker" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 18V6l12-2v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
+        </span>
+        <p class="eyebrow">A few of my favorite things</p>
+        <h2 class="hobby-detail__title" id="hobby-music-title">Music</h2>
+        <p class="lede" data-placeholder>[Editable: what music means to you &mdash; do you play an instrument, sing, or produce, or is it mostly listening? Which genres and artists shaped your taste?]</p>
+
+        <!-- ALBUM CAROUSEL — drag, or use the arrows. -->
+        <!-- To use a real cover: add a background image to .album__cover and remove data-placeholder, e.g.
+             <figure class="album"><div class="album__cover" style="background-image:url('assets/albums/my-cover.jpg')"></div> ... -->
+        <div class="albums" aria-roledescription="carousel" aria-label="Albums on repeat">
+          <div class="albums__head">
+            <h3 class="albums__title ital">On repeat</h3>
+            <div class="albums__nav">
+              <button class="albums__btn" type="button" data-album-prev aria-label="Previous albums">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="albums__btn" type="button" data-album-next aria-label="Next albums">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="albums__track" data-album-track data-lenis-prevent>
+            <figure class="album">
+              <div class="album__cover" style="background-image:url('assets/albums/take-care.jpg')" role="img" aria-label="Take Care by Drake album cover"></div>
+              <figcaption class="album__meta"><span class="album__name">Take Care</span><span class="album__artist">Drake</span></figcaption>
+            </figure>
+            <figure class="album">
+              <div class="album__cover" style="background-image:url('assets/albums/blonde.jpg')" role="img" aria-label="Blonde by Frank Ocean album cover"></div>
+              <figcaption class="album__meta"><span class="album__name">Blonde</span><span class="album__artist">Frank Ocean</span></figcaption>
+            </figure>
+            <figure class="album">
+              <div class="album__cover" style="background-image:url('assets/albums/unorthodox-jukebox.jpg')" role="img" aria-label="Unorthodox Jukebox by Bruno Mars album cover"></div>
+              <figcaption class="album__meta"><span class="album__name">Unorthodox Jukebox</span><span class="album__artist">Bruno Mars</span></figcaption>
+            </figure>
+            <figure class="album">
+              <div class="album__cover" style="background-image:url('assets/albums/4-your-eyez-only.jpg')" role="img" aria-label="4 Your Eyez Only by J. Cole album cover"></div>
+              <figcaption class="album__meta"><span class="album__name">4 Your Eyez Only</span><span class="album__artist">J. Cole</span></figcaption>
+            </figure>
+            <figure class="album">
+              <div class="album__cover" style="background-image:url('assets/albums/iceman.jpg')" role="img" aria-label="ICEMAN by Drake album cover"></div>
+              <figcaption class="album__meta"><span class="album__name">ICEMAN</span><span class="album__artist">Drake</span></figcaption>
+            </figure>
+            <figure class="album">
+              <div class="album__cover" style="background-image:url('assets/albums/graduation.jpg')" role="img" aria-label="Graduation by Kanye West album cover"></div>
+              <figcaption class="album__meta"><span class="album__name">Graduation</span><span class="album__artist">Kanye West</span></figcaption>
+            </figure>
+            <figure class="album">
+              <div class="album__cover" style="background-image:url('assets/albums/mbdtf.jpg')" role="img" aria-label="My Beautiful Dark Twisted Fantasy by Kanye West album cover"></div>
+              <figcaption class="album__meta"><span class="album__name">My Beautiful Dark Twisted Fantasy</span><span class="album__artist">Kanye West</span></figcaption>
+            </figure>
+            <figure class="album">
+              <div class="album__cover" style="background-image:url('assets/albums/abba-gold.jpg')" role="img" aria-label="Gold: Greatest Hits by ABBA album cover"></div>
+              <figcaption class="album__meta"><span class="album__name">Gold: Greatest Hits</span><span class="album__artist">ABBA</span></figcaption>
+            </figure>
+            <figure class="album">
+              <div class="album__cover" style="background-image:url('assets/albums/billy-joel-the-stranger.jpg')" role="img" aria-label="The Stranger by Billy Joel album cover"></div>
+              <figcaption class="album__meta"><span class="album__name">The Stranger</span><span class="album__artist">Billy Joel</span></figcaption>
+            </figure>
+            <figure class="album">
+              <div class="album__cover" style="background-image:url('assets/albums/igor.jpg')" role="img" aria-label="IGOR by Tyler, the Creator album cover"></div>
+              <figcaption class="album__meta"><span class="album__name">IGOR</span><span class="album__artist">Tyler, the Creator</span></figcaption>
+            </figure>
+            <figure class="album">
+              <div class="album__cover" style="background-image:url('assets/albums/freudian.jpg')" role="img" aria-label="Freudian by Daniel Caesar album cover"></div>
+              <figcaption class="album__meta"><span class="album__name">Freudian</span><span class="album__artist">Daniel Caesar</span></figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPORTS -->
+  <section class="hobby-detail" id="hobby-sports" role="dialog" aria-modal="true" aria-labelledby="hobby-sports-title" hidden>
+    <div class="hobby-detail__bar">
+      <button class="hobby-detail__back" type="button" data-hobby-close>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back
+      </button>
+      <span class="hobby-detail__crumb">Hobbies / Sports</span>
+    </div>
+    <div class="hobby-detail__scroll" data-lenis-prevent>
+      <div class="container hobby-detail__inner">
+        <span class="hobby-detail__kicker" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <p class="eyebrow">A few of my favorite things</p>
+        <h2 class="hobby-detail__title" id="hobby-sports-title">Sports</h2>
+        <p class="lede" data-placeholder>[Editable: which sports do you play or follow? Positions, teams, and what you love about competing.]</p>
+        <div class="hobby-detail__highlights">
+          <div class="card" data-placeholder>
+            <h3 class="card__title">Sports I play</h3>
+            <p class="value__text">[The sports you actually get out and play.]</p>
+          </div>
+          <div class="card" data-placeholder>
+            <h3 class="card__title">Teams I follow</h3>
+            <p class="value__text">[Who you root for &mdash; college, pro, local.]</p>
+          </div>
+          <div class="card" data-placeholder>
+            <h3 class="card__title">Why I love it</h3>
+            <p class="value__text">[Competition, teamwork, staying active &mdash; what draws you in.]</p>
+          </div>
+        </div>
+        <div class="hobby-detail__media" data-placeholder aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEO GAMES -->
+  <section class="hobby-detail" id="hobby-games" role="dialog" aria-modal="true" aria-labelledby="hobby-games-title" hidden>
+    <div class="hobby-detail__bar">
+      <button class="hobby-detail__back" type="button" data-hobby-close>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back
+      </button>
+      <span class="hobby-detail__crumb">Hobbies / Video Games</span>
+    </div>
+    <div class="hobby-detail__scroll" data-lenis-prevent>
+      <div class="container hobby-detail__inner">
+        <span class="hobby-detail__kicker" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="12" rx="5" stroke="currentColor" stroke-width="1.6"/><path d="M6 12h4M8 10v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.5" cy="11" r="1" fill="currentColor"/><circle cx="17.5" cy="13.5" r="1" fill="currentColor"/></svg>
+        </span>
+        <p class="eyebrow">A few of my favorite things</p>
+        <h2 class="hobby-detail__title" id="hobby-games-title">Video Games</h2>
+        <p class="lede" data-placeholder>[Editable: favorite games and genres, and what you enjoy most &mdash; competition, story, building, or playing with friends.]</p>
+        <div class="hobby-detail__highlights">
+          <div class="card" data-placeholder>
+            <h3 class="card__title">Go-to games</h3>
+            <p class="value__text">[The titles you keep coming back to.]</p>
+          </div>
+          <div class="card" data-placeholder>
+            <h3 class="card__title">Platforms</h3>
+            <p class="value__text">[PC, console, mobile &mdash; how you play.]</p>
+          </div>
+          <div class="card" data-placeholder>
+            <h3 class="card__title">What hooks me</h3>
+            <p class="value__text">[The competition, the story, the people you play with.]</p>
+          </div>
+        </div>
+        <div class="hobby-detail__media" data-placeholder aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOFTWARE / APP DEVELOPMENT -->
+  <section class="hobby-detail" id="hobby-dev" role="dialog" aria-modal="true" aria-labelledby="hobby-dev-title" hidden>
+    <div class="hobby-detail__bar">
+      <button class="hobby-detail__back" type="button" data-hobby-close>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back
+      </button>
+      <span class="hobby-detail__crumb">Hobbies / Software &amp; App Development</span>
+    </div>
+    <div class="hobby-detail__scroll" data-lenis-prevent>
+      <div class="container hobby-detail__inner">
+        <span class="hobby-detail__kicker" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M8 9l-3 3 3 3M16 9l3 3-3 3M13.5 7l-3 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <p class="eyebrow">A few of my favorite things</p>
+        <h2 class="hobby-detail__title" id="hobby-dev-title">Software / App Development</h2>
+        <p class="lede" data-placeholder>[Editable: what you like to build, the languages and tools you use, and what got you into development. (Your Rebel Hauling site lives in the Projects section.)]</p>
+        <div class="hobby-detail__highlights">
+          <div class="card" data-placeholder>
+            <h3 class="card__title">Languages &amp; tools</h3>
+            <p class="value__text">[The stack you reach for &mdash; languages, frameworks, tools.]</p>
+          </div>
+          <div class="card" data-placeholder>
+            <h3 class="card__title">What I'm building</h3>
+            <p class="value__text">[Projects, ideas, or things you're tinkering with right now.]</p>
+          </div>
+          <div class="card" data-placeholder>
+            <h3 class="card__title">What drives me</h3>
+            <p class="value__text">[Why you build &mdash; solving problems, creating, learning.]</p>
+          </div>
+        </div>
+        <div class="hobby-detail__cta">
+          <a class="pill pill--ghost" href="#projects" data-hobby-close>
+            See my projects
+            <svg class="pill__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Full-screen menu (top-level so it overlays everything) -->
+  <nav class="menu" id="menu" aria-label="Primary" hidden>
+    <ul class="menu__list">
+      <li><a class="menu__link" href="#home">Home</a></li>
+      <li><a class="menu__link" href="#about">About Me</a></li>
+      <li><a class="menu__link" href="#hobbies">Hobbies</a></li>
+      <li><a class="menu__link" href="#projects">Projects</a></li>
+      <li><a class="menu__link" href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <script>
+    (function () {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* ----- Full-screen menu ----- */
+      const toggle = document.getElementById('menuToggle');
+      const menu = document.getElementById('menu');
+      const setOpen = (open) => {
+        document.body.classList.toggle('menu-open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        if (open) { menu.hidden = false; }
+        else { setTimeout(() => { if (!document.body.classList.contains('menu-open')) menu.hidden = true; }, 350); }
+      };
+      toggle.addEventListener('click', () => setOpen(!document.body.classList.contains('menu-open')));
+      menu.addEventListener('click', (e) => { if (e.target.matches('.menu__link')) setOpen(false); });
+
+      /* ----- Hobby detail views (off-canvas, not in scroll flow) ----- */
+      let openPanel = null;    // currently open .hobby-detail element
+      let lastFocused = null;  // element to restore focus to on close
+
+      const openHobby = (key, opener) => {
+        const panel = document.getElementById('hobby-' + key);
+        if (!panel) return;
+        lastFocused = opener || null;
+        openPanel = panel;
+        panel.hidden = false;
+        if (window.__lenis) window.__lenis.stop();   // freeze the page so only the panel scrolls
+        // next frame so the transition runs from the hidden state
+        requestAnimationFrame(() => {
+          panel.classList.add('is-open');
+          document.body.classList.add('hobby-open');
+          const back = panel.querySelector('[data-hobby-close]');
+          if (back) back.focus();
+          panel.scrollTop = 0;
+          const scroller = panel.querySelector('.hobby-detail__scroll');
+          if (scroller) scroller.scrollTop = 0;
+        });
+      };
+
+      const closeHobby = () => {
+        if (!openPanel) return;
+        const panel = openPanel;
+        openPanel = null;
+        panel.classList.remove('is-open');
+        document.body.classList.remove('hobby-open');
+        if (window.__lenis) window.__lenis.start();   // resume page scroll
+        setTimeout(() => { if (!panel.classList.contains('is-open')) panel.hidden = true; }, 450);
+        if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+        lastFocused = null;
+      };
+
+      document.querySelectorAll('[data-hobby]').forEach((card) => {
+        card.addEventListener('click', () => openHobby(card.getAttribute('data-hobby'), card));
+      });
+      document.querySelectorAll('[data-hobby-close]').forEach((btn) => {
+        btn.addEventListener('click', closeHobby);
+      });
+
+      /* ----- Music album carousel (arrows + drag) ----- */
+      const track = document.querySelector('[data-album-track]');
+      if (track) {
+        const prevBtn = document.querySelector('[data-album-prev]');
+        const nextBtn = document.querySelector('[data-album-next]');
+        const step = () => {
+          const card = track.querySelector('.album');
+          const gap = parseFloat(getComputedStyle(track).gap) || 24;
+          return card ? card.getBoundingClientRect().width + gap : 220;
+        };
+        const updateBtns = () => {
+          const max = track.scrollWidth - track.clientWidth - 2;
+          if (prevBtn) prevBtn.disabled = track.scrollLeft <= 2;
+          if (nextBtn) nextBtn.disabled = track.scrollLeft >= max;
+        };
+        if (prevBtn) prevBtn.addEventListener('click', () => track.scrollBy({ left: -step() * 2, behavior: 'smooth' }));
+        if (nextBtn) nextBtn.addEventListener('click', () => track.scrollBy({ left: step() * 2, behavior: 'smooth' }));
+        track.addEventListener('scroll', updateBtns, { passive: true });
+        window.addEventListener('resize', updateBtns);
+
+        // drag / swipe to scroll
+        let down = false, startX = 0, startLeft = 0, moved = false;
+        track.addEventListener('pointerdown', (e) => {
+          down = true; moved = false; startX = e.clientX; startLeft = track.scrollLeft;
+          track.classList.add('is-dragging'); track.setPointerCapture(e.pointerId);
+        });
+        track.addEventListener('pointermove', (e) => {
+          if (!down) return;
+          const dx = e.clientX - startX;
+          if (Math.abs(dx) > 3) moved = true;
+          track.scrollLeft = startLeft - dx;
+        });
+        const endDrag = (e) => {
+          if (!down) return;
+          down = false; track.classList.remove('is-dragging');
+          try { track.releasePointerCapture(e.pointerId); } catch (_) {}
+        };
+        track.addEventListener('pointerup', endDrag);
+        track.addEventListener('pointercancel', endDrag);
+        // swallow the click that ends a drag so it doesn't feel jumpy
+        track.addEventListener('click', (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
+
+        updateBtns();
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        if (openPanel) closeHobby();
+        else setOpen(false);
+      });
+
+      /* ----- Scroll-reveal animations (re-trigger on scroll up AND down) ----- */
+      const animated = document.querySelectorAll('.reveal, .stagger');
+      if (reduce || !('IntersectionObserver' in window)) {
+        animated.forEach((el) => el.classList.add('is-visible'));
+      } else {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            // toggle (not add-once) so elements re-animate each time they re-enter view
+            entry.target.classList.toggle('is-visible', entry.isIntersecting);
+          });
+        }, { threshold: 0.18, rootMargin: '0px 0px -10% 0px' });
+        animated.forEach((el) => io.observe(el));
+      }
+
+      /* ----- Hero CONTENTS fade out on scroll (background stays visible) ----- */
+      const heroContent = document.querySelectorAll('.topbar, .hero__center, .hero__footer');
+      let ticking = false;
+      const updateHero = () => {
+        const fadeOver = window.innerHeight * 0.85;
+        const p = Math.min(Math.max(window.scrollY / fadeOver, 0), 1);
+        const opacity = String(1 - p);
+        heroContent.forEach((el) => { el.style.opacity = opacity; });
+        ticking = false;
+      };
+      window.addEventListener('scroll', () => {
+        if (!ticking) { ticking = true; requestAnimationFrame(updateHero); }
+      }, { passive: true });
+      updateHero();
+
+      /* ----- Contact: live local time (Central) ----- */
+      const timeEl = document.getElementById('current-time');
+      const updateTime = () => {
+        if (!timeEl) return;
+        timeEl.textContent = new Date().toLocaleTimeString('en-US', {
+          timeZone: 'America/Chicago', hour: '2-digit', minute: '2-digit', hour12: true
+        });
+      };
+      updateTime();
+      setInterval(updateTime, 30000);
+
+      /* ----- Contact form -> opens a pre-filled email (no backend needed) ----- */
+      const form = document.getElementById('contactForm');
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const data = new FormData(form);
+          const name = (data.get('name') || '').toString().trim();
+          const email = (data.get('email') || '').toString().trim();
+          const message = (data.get('message') || '').toString().trim();
+          const subject = encodeURIComponent('Website message' + (name ? ' from ' + name : ''));
+          const body = encodeURIComponent(message + '\n\n— ' + name + (email ? ' <' + email + '>' : ''));
+          window.location.href = 'mailto:ethanmic6@gmail.com?subject=' + subject + '&body=' + body;
+        });
+      }
+    })();
+  </script>
+
+  <!-- Smooth inertia scrolling (Lenis) — skipped for reduced-motion / offline -->
+  <script type="module">
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      try {
+        const { default: Lenis } = await import('https://cdn.jsdelivr.net/npm/lenis@1.1.20/+esm');
+        const lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+        window.__lenis = lenis;   // exposed so the hobby overlay can pause/resume page scroll
+        const raf = (time) => { lenis.raf(time); requestAnimationFrame(raf); };
+        requestAnimationFrame(raf);
+
+        // Route in-page anchor links through Lenis for smooth jumps
+        document.querySelectorAll('a[href^="#"]').forEach((a) => {
+          a.addEventListener('click', (e) => {
+            const id = a.getAttribute('href');
+            if (id.length > 1) {
+              const target = document.querySelector(id);
+              if (target) { e.preventDefault(); lenis.scrollTo(target); }
+            }
+          });
+        });
+      } catch (err) {
+        /* CDN unreachable (e.g. offline) — native scrolling still works */
+      }
+    }
+  </script>
+</body>
+</html>

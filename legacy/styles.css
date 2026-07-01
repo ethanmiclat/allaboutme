@@ -1,0 +1,1119 @@
+:root {
+  --ink: #ffffff;
+  --ink-dim: rgba(255, 255, 255, 0.78);
+  --cream: #f6ead2;        /* warm pill, echoes the sky highlights */
+  --cream-text: #2b2419;
+  --dark: #1d2730;         /* slate pulled from the sea */
+  --line: rgba(255, 255, 255, 0.55);
+
+  /* Section surfaces & text (atmospheric minimalist) */
+  --surface: #141b22;
+  --surface-alt: #0e141a;
+  --card: #1a222b;
+  --text: #e3e6ec;
+  --text-dim: #aab4bd;
+  --text-faint: #818b95;
+  --hairline: rgba(227, 230, 236, 0.12);
+  --maxw: 1200px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background: var(--dark);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; }
+}
+
+/* ---------- HERO SHELL (sticky: stays still while content scrolls over it) ---------- */
+.hero {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 0;
+}
+
+/* Hero foreground layers fade out on scroll; background stays put (driven by JS) */
+.topbar, .hero__center, .hero__footer { will-change: opacity; }
+
+/* Content layer that scrolls up and takes over the hero */
+.content {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+}
+
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("assets/hero-bg.jpeg");
+  background-size: cover;
+  background-position: 60% 88%;   /* pushed further down to show more of Ethan */
+  transform: scale(1.04);
+  animation: slowDrift 28s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+@keyframes slowDrift {
+  from { transform: scale(1.04); }
+  to   { transform: scale(1.08); }
+}
+
+/* Soft, airy wash — just enough to keep white text legible */
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(90% 70% at 50% 48%, rgba(25, 33, 40, 0.32) 0%, rgba(25, 33, 40, 0.12) 55%, rgba(25, 33, 40, 0) 80%),
+    linear-gradient(180deg, rgba(25, 33, 40, 0.34) 0%, rgba(25, 33, 40, 0.04) 22%, rgba(25, 33, 40, 0.06) 70%, rgba(25, 33, 40, 0.45) 100%);
+}
+
+/* ---------- TOP BAR ---------- */
+.topbar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px clamp(20px, 4vw, 56px);
+}
+
+.brandmark {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 400;
+  font-size: clamp(20px, 2vw, 28px);
+  letter-spacing: 0.31em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  text-indent: 0.31em;            /* optical centering for tracked caps */
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+}
+
+.menu-btn {
+  position: fixed;
+  top: 30px;
+  right: clamp(20px, 4vw, 56px);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 56px;
+  height: 56px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+.menu-btn:hover { background: rgba(255, 255, 255, 0.16); border-color: #fff; }
+.menu-btn span {
+  display: block;
+  height: 1.5px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.25s ease;
+}
+.menu-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+/* hamburger -> X when open */
+body.menu-open .menu-btn span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+body.menu-open .menu-btn span:nth-child(2) { opacity: 0; }
+body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* ---------- CENTER ---------- */
+.hero__center {
+  position: relative;
+  z-index: 3;
+  margin: auto;
+  text-align: center;
+  padding: 0 clamp(20px, 6vw, 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(28px, 4vh, 44px);
+}
+
+.hero__title {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 300;
+  font-style: italic;                 /* softer, fancier, more subtle */
+  font-size: clamp(46px, 8.5vw, 116px);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.9);    /* dialed back so it reads as subtle */
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.28);
+  animation: rise 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ---------- PILLS ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 0 28px;
+  border-radius: 100px;
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+.pill__icon { width: 19px; height: 19px; flex-shrink: 0; }
+
+.pill--cream {
+  background: var(--cream);
+  color: var(--cream-text);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+  animation: rise 1s 0.12s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.pill--cream:hover { transform: translateY(-2px); background: #fbf2df; }
+
+.pill--dark {
+  background: var(--dark);
+  color: var(--ink);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.28);
+}
+.pill--dark:hover { transform: translateY(-2px); background: #28333d; }
+
+.pill:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- FOOTER ---------- */
+.hero__footer {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 clamp(20px, 4vw, 56px) clamp(28px, 4vh, 44px);
+}
+
+.scroll-cue {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--ink-dim);
+  position: relative;
+  padding-bottom: 26px;
+}
+.scroll-cue::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 1px;
+  height: 18px;
+  background: var(--ink-dim);
+  animation: scrollPulse 1.9s ease-in-out infinite;
+  transform-origin: top;
+}
+@keyframes scrollPulse {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.4; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+.contact-pill { position: absolute; right: clamp(20px, 4vw, 56px); bottom: clamp(24px, 4vh, 40px); }
+
+/* ---------- FULL-SCREEN MENU ---------- */
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 27, 33, 0.82);
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+body.menu-open .menu { opacity: 1; pointer-events: auto; }
+
+.menu__list { list-style: none; text-align: center; }
+.menu__list li { overflow: hidden; }
+
+.menu__link {
+  display: inline-block;
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 300;
+  font-size: clamp(34px, 6vw, 64px);
+  line-height: 1.5;
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  opacity: 0.85;
+  transform: translateY(110%);
+  transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), letter-spacing 0.3s ease;
+}
+.menu__link:hover { opacity: 1; letter-spacing: 0.06em; }
+body.menu-open .menu__link { transform: translateY(0); }
+body.menu-open .menu__list li:nth-child(1) .menu__link { transition-delay: 0.06s; }
+body.menu-open .menu__list li:nth-child(2) .menu__link { transition-delay: 0.12s; }
+body.menu-open .menu__list li:nth-child(3) .menu__link { transition-delay: 0.18s; }
+body.menu-open .menu__list li:nth-child(4) .menu__link { transition-delay: 0.24s; }
+body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s; }
+
+/* ============ SCROLL-REVEAL ANIMATIONS ============ */
+/* Hidden state only applies when JS is active, so no-JS users see everything. */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.js .reveal.is-visible { opacity: 1; transform: none; }
+
+/* Staggered groups: children animate in sequence when the container enters view */
+.js .stagger > * {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.js .stagger.is-visible > * { opacity: 1; transform: none; }
+.js .stagger.is-visible > *:nth-child(1) { transition-delay: 0.05s; }
+.js .stagger.is-visible > *:nth-child(2) { transition-delay: 0.13s; }
+.js .stagger.is-visible > *:nth-child(3) { transition-delay: 0.21s; }
+.js .stagger.is-visible > *:nth-child(4) { transition-delay: 0.29s; }
+.js .stagger.is-visible > *:nth-child(5) { transition-delay: 0.37s; }
+.js .stagger.is-visible > *:nth-child(6) { transition-delay: 0.45s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal, .js .stagger > * { opacity: 1 !important; transform: none !important; }
+}
+
+/* ============ SHARED SECTION SYSTEM ============ */
+.section {
+  position: relative;
+  background: var(--surface);
+  color: var(--text);
+  padding: clamp(80px, 12vh, 150px) 0;
+  scroll-margin-top: 24px;
+}
+.section--alt { background: var(--surface-alt); }
+
+.container {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 clamp(20px, 5vw, 64px);
+}
+
+.eyebrow {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 16px;
+}
+
+.section__title {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 400;
+  font-size: clamp(34px, 5vw, 64px);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.section__title--center { text-align: center; }
+.ital { font-style: italic; font-weight: 300; color: var(--text-dim); }
+
+.section__head { margin-bottom: clamp(40px, 6vh, 72px); text-align: center; }
+.section__head .eyebrow { text-align: center; }
+
+.lede {
+  font-size: clamp(16px, 1.4vw, 19px);
+  line-height: 1.7;
+  color: var(--text-dim);
+  max-width: 62ch;
+}
+.body-text {
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--text-faint);
+  max-width: 62ch;
+}
+[data-placeholder] { /* visual hint that copy is editable */ }
+.body-text[data-placeholder] { font-style: italic; }
+
+/* ============ ABOUT ============ */
+.about__grid {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+}
+.about__left { display: flex; flex-direction: column; gap: 28px; }
+
+.portrait {
+  aspect-ratio: 3 / 4;
+  border-radius: 24px;
+  background-image: url("assets/IMG_3456.jpeg");
+  background-size: cover;
+  background-position: center top;
+  border: 1px solid var(--hairline);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-radius: 24px;
+  padding: clamp(24px, 3vw, 36px);
+}
+.card__title {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 30px;
+  margin-bottom: 24px;
+  color: var(--text);
+}
+.values { list-style: none; display: flex; flex-direction: column; gap: 22px; }
+.value { display: flex; gap: 16px; }
+.value__icon { flex-shrink: 0; color: var(--cream); }
+.value__icon svg { width: 24px; height: 24px; }
+.value__title { font-size: 15px; font-weight: 600; letter-spacing: 0.02em; margin-bottom: 4px; color: var(--text); }
+.value__text { font-size: 14px; line-height: 1.6; color: var(--text-dim); }
+
+.about__right { padding-top: 8px; }
+.about__right .section__title { margin-bottom: 24px; }
+.about__right .lede { margin-bottom: 18px; }
+
+.timeline { margin-top: 48px; padding-top: 40px; border-top: 1px solid var(--hairline); }
+.timeline__label {
+  font-family: "Inter", sans-serif;
+  font-size: 12px; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text-faint); margin-bottom: 32px;
+}
+.timeline__list { list-style: none; position: relative; padding-left: 28px; border-left: 1px solid var(--hairline); }
+.timeline__item { position: relative; padding-bottom: 36px; }
+.timeline__item:last-child { padding-bottom: 0; }
+.timeline__dot {
+  position: absolute; left: -34px; top: 4px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--text-faint);
+  box-shadow: 0 0 0 6px var(--surface);
+}
+.timeline__dot--active { background: var(--cream); }
+.timeline__time { display: block; font-size: 12px; letter-spacing: 0.06em; color: var(--text-faint); margin-bottom: 6px; }
+.timeline__title { font-family: "Cormorant Garamond", serif; font-style: italic; font-weight: 400; font-size: 24px; color: var(--text); margin-bottom: 6px; }
+.timeline__text { font-size: 14px; line-height: 1.6; color: var(--text-dim); }
+
+/* ============ PROJECTS ============ */
+.projects__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 2.4vw, 32px);
+}
+.project-card {
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-radius: 24px;
+  padding: 16px;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.project-card:hover { transform: translateY(-4px); border-color: rgba(246, 234, 210, 0.4); }
+.project-card__thumb {
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #232e38, #161d24);
+  margin-bottom: 18px;
+}
+.project-card__title { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 24px; padding: 0 6px; margin-bottom: 6px; color: var(--text); }
+.project-card__meta { font-size: 14px; line-height: 1.6; color: var(--text-dim); padding: 0 6px 8px; }
+
+.projects__actions { display: flex; justify-content: center; gap: 14px; margin-top: clamp(40px, 6vh, 64px); flex-wrap: wrap; }
+
+/* ============ HOBBIES (BENTO) ============ */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 200px;
+  gap: clamp(16px, 1.6vw, 24px);
+}
+.bento__tile {
+  position: relative;
+  border-radius: 24px;
+  border: 1px solid var(--hairline);
+  background: linear-gradient(135deg, #202a33, #141b22);
+  display: flex;
+  align-items: flex-end;
+  padding: 24px;
+  overflow: hidden;
+}
+.bento__tile--lg { grid-column: span 2; grid-row: span 2; }
+.bento__tile--tall { grid-column: span 1; grid-row: span 2; }
+.bento__label {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 26px;
+  color: var(--text);
+}
+.bento__quote {
+  grid-column: span 1;
+  background: var(--card);
+  align-items: center;
+  text-align: center;
+}
+.bento__quote p {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+/* ============ CONTACT ============ */
+.contact__inner { text-align: center; display: flex; flex-direction: column; align-items: center; }
+.contact__inner .eyebrow { text-align: center; }
+.contact__lede { margin: 18px auto 0; }
+.contact__actions { display: flex; gap: 14px; margin-top: 36px; flex-wrap: wrap; justify-content: center; }
+
+/* Ghost pill for dark section backgrounds */
+.pill--ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--hairline);
+}
+.pill--ghost:hover { transform: translateY(-2px); border-color: rgba(246, 234, 210, 0.5); background: rgba(255, 255, 255, 0.04); }
+
+/* ============ HOBBIES (editorial bento) ============ */
+.hobby-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(16px, 1.8vw, 28px);
+}
+.hobby-card {
+  position: relative;
+  grid-column: span 4;
+  height: clamp(340px, 40vw, 540px);
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  /* now a <button> that opens a detail view */
+  display: block;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  background: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+.hobby-card:hover { transform: translateY(-4px); border-color: rgba(246, 234, 210, 0.4); }
+.hobby-card:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
+.hobby-card--lg { grid-column: span 8; }
+.hobby-card__media {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #232e38, #141b22);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hobby-card:hover .hobby-card__media { transform: scale(1.05); }
+.hobby-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 14, 18, 0.92) 0%, rgba(10, 14, 18, 0.25) 55%, transparent 100%);
+}
+.hobby-card__body {
+  position: absolute;
+  left: 0; bottom: 0;
+  z-index: 1;
+  padding: clamp(24px, 3vw, 44px);
+  max-width: 560px;
+}
+.hobby-card__icon { display: inline-flex; color: var(--cream); margin-bottom: 14px; }
+.hobby-card__icon svg { width: 22px; height: 22px; }
+.hobby-card__title {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 400;
+  font-size: clamp(26px, 2.6vw, 40px);
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.hobby-card__text { font-size: 15px; line-height: 1.65; color: var(--text-dim); }
+.hobby-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cream);
+}
+.hobby-card__cta svg { width: 16px; height: 16px; transition: transform 0.3s ease; }
+.hobby-card:hover .hobby-card__cta svg { transform: translateX(5px); }
+
+/* ============ HOBBY DETAIL VIEWS (off-canvas overlays) ============ */
+.hobby-detail {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(18px);
+  transition: opacity 0.4s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hobby-detail.is-open { opacity: 1; pointer-events: auto; transform: none; }
+
+.hobby-detail__bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px clamp(20px, 5vw, 64px);
+  border-bottom: 1px solid var(--hairline);
+  background: rgba(20, 27, 33, 0.7);
+  backdrop-filter: blur(12px);
+}
+.hobby-detail__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: 100px;
+  padding: 10px 18px;
+  color: var(--text);
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+.hobby-detail__back:hover { border-color: var(--cream); background: rgba(255, 255, 255, 0.04); }
+.hobby-detail__back:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
+.hobby-detail__back svg { width: 18px; height: 18px; }
+.hobby-detail__crumb {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.hobby-detail__scroll { flex: 1; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.hobby-detail__inner {
+  padding-top: clamp(48px, 9vh, 110px);
+  padding-bottom: clamp(64px, 12vh, 150px);
+}
+
+.hobby-detail__kicker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  border: 1px solid var(--hairline);
+  color: var(--cream);
+  margin-bottom: 24px;
+}
+.hobby-detail__kicker svg { width: 26px; height: 26px; }
+
+.hobby-detail__title {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 400;
+  font-size: clamp(48px, 9vw, 116px);
+  line-height: 1.0;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 6px 0 26px;
+}
+.hobby-detail .lede { margin-bottom: clamp(36px, 6vh, 64px); }
+
+.hobby-detail__highlights {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(16px, 2vw, 28px);
+}
+.hobby-detail__highlights .card__title {
+  font-size: 22px;
+  margin-bottom: 14px;
+}
+
+.hobby-detail__media {
+  margin-top: clamp(36px, 6vh, 64px);
+  aspect-ratio: 21 / 9;
+  border-radius: 24px;
+  border: 1px solid var(--hairline);
+  background: linear-gradient(135deg, #232e38, #141b22);
+}
+
+.hobby-detail__cta { margin-top: clamp(40px, 7vh, 72px); }
+
+/* ----- Album carousel (Music) ----- */
+.albums { margin-top: clamp(36px, 6vh, 64px); }
+.albums__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.albums__title {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 400;
+  font-size: clamp(24px, 3vw, 36px);
+  color: var(--text);
+}
+.albums__nav { display: flex; gap: 10px; flex-shrink: 0; }
+.albums__btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--hairline);
+  background: transparent;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.25s ease, background 0.25s ease, opacity 0.25s ease;
+}
+.albums__btn:hover { border-color: var(--cream); background: rgba(255, 255, 255, 0.04); }
+.albums__btn:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
+.albums__btn svg { width: 20px; height: 20px; }
+.albums__btn:disabled { opacity: 0.3; cursor: default; }
+.albums__btn:disabled:hover { border-color: var(--hairline); background: transparent; }
+
+.albums__track {
+  display: flex;
+  gap: clamp(16px, 2vw, 28px);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding-bottom: 16px;
+  cursor: grab;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.albums__track::-webkit-scrollbar { display: none; }
+.albums__track.is-dragging { scroll-behavior: auto; cursor: grabbing; scroll-snap-type: none; }
+
+.album {
+  flex: 0 0 auto;
+  width: clamp(170px, 22vw, 230px);
+  scroll-snap-align: start;
+}
+.album__cover {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  background-color: #1a222b;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.album:hover .album__cover { transform: translateY(-4px); }
+/* tinted placeholder shown until a real cover image is added (then remove data-placeholder) */
+.album[data-placeholder] .album__cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #2a3742, #141b22);
+}
+.album[data-placeholder]:nth-of-type(2) .album__cover::after { background: linear-gradient(135deg, #3a2c3f, #16121b); }
+.album[data-placeholder]:nth-of-type(3) .album__cover::after { background: linear-gradient(135deg, #243a35, #10171a); }
+.album[data-placeholder]:nth-of-type(4) .album__cover::after { background: linear-gradient(135deg, #3a3324, #181307); }
+.album[data-placeholder]:nth-of-type(5) .album__cover::after { background: linear-gradient(135deg, #2c3550, #101526); }
+.album[data-placeholder]:nth-of-type(6) .album__cover::after { background: linear-gradient(135deg, #402a2a, #1a0f0f); }
+.album[data-placeholder]:nth-of-type(7) .album__cover::after { background: linear-gradient(135deg, #26323a, #0f1418); }
+.album__ph { position: relative; z-index: 1; color: var(--cream); opacity: 0.45; }
+.album__ph svg { width: 34px; height: 34px; }
+
+.album__meta { display: flex; flex-direction: column; gap: 3px; margin-top: 14px; padding: 0 2px; }
+.album__name { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 18px; color: var(--text); }
+.album__artist { font-size: 13px; letter-spacing: 0.04em; color: var(--text-faint); }
+
+@media (max-width: 900px) {
+  .hobby-detail__highlights { grid-template-columns: 1fr; }
+}
+
+/* Quote block */
+.quote-block {
+  max-width: 760px;
+  margin: clamp(60px, 10vh, 130px) auto 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+.quote-rule { width: 48px; height: 1px; background: var(--hairline); }
+.quote-text {
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(24px, 3vw, 40px);
+  line-height: 1.4;
+  color: var(--text);
+}
+
+/* ============ PROJECTS (editorial) ============ */
+.section__head--left { text-align: left; }
+.section__head--left .eyebrow { text-align: left; }
+.projects__headline {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 400;
+  font-size: clamp(48px, 8vw, 104px);
+  line-height: 1.0;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.projects__list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(64px, 11vh, 150px);
+  margin-top: clamp(48px, 7vh, 90px);
+}
+
+/* Reusable media frame */
+.proj-media {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+}
+.proj-media--16x9 { aspect-ratio: 16 / 9; }
+.proj-media--4x5 { aspect-ratio: 4 / 5; }
+.proj-media--21x9 { aspect-ratio: 21 / 9; }
+.proj-media__img {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #243039, #141b22);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.proj-media__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+article:hover .proj-media__img,
+article:hover .proj-media__video { transform: scale(1.05); }
+
+.proj__meta {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 14px;
+}
+.proj__title {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 400;
+  font-size: clamp(28px, 3vw, 46px);
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.proj__title--lg { font-size: clamp(34px, 4.5vw, 64px); }
+.proj__desc { font-size: 16px; line-height: 1.7; color: var(--text-dim); max-width: 46ch; }
+
+.proj__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  transition: gap 0.3s ease;
+}
+.proj__link svg { width: 18px; height: 18px; }
+.proj__link:hover { gap: 18px; }
+.proj__link-underline {
+  display: inline-block;
+  margin-top: 18px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--hairline);
+  transition: border-color 0.25s ease;
+}
+.proj__link-underline:hover { border-color: var(--cream); }
+
+/* Featured */
+.proj-featured {
+  display: grid;
+  grid-template-columns: 8fr 4fr;
+  gap: clamp(28px, 3.5vw, 56px);
+  align-items: center;
+}
+
+/* Staggered pair */
+.proj-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(28px, 4vw, 64px);
+  align-items: start;
+}
+.proj-card .proj-media { margin-bottom: 22px; }
+.proj-card--offset { margin-top: clamp(0px, 7vw, 110px); }
+
+/* Full-width narrative */
+.proj-wide { position: relative; }
+.proj-wide .proj-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(8, 12, 16, 0.9) 0%, rgba(8, 12, 16, 0.2) 55%, transparent 100%);
+}
+.proj-wide__info {
+  position: absolute;
+  left: 0; bottom: 0;
+  z-index: 2;
+  padding: clamp(24px, 4vw, 64px);
+  max-width: 620px;
+}
+
+/* CTA */
+.projects__cta {
+  max-width: 640px;
+  margin: clamp(64px, 11vh, 130px) auto 0;
+  padding-top: clamp(40px, 6vh, 72px);
+  border-top: 1px solid var(--hairline);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.projects__cta-title {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 400;
+  font-size: clamp(28px, 3.4vw, 46px);
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.projects__cta-text { font-size: 16px; line-height: 1.7; color: var(--text-dim); margin-bottom: 30px; }
+
+/* ============ CONTACT (rich) ============ */
+.contact__grid {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: clamp(36px, 5vw, 80px);
+  align-items: center;
+}
+.contact__intro { display: flex; flex-direction: column; }
+.contact__title {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 400;
+  font-size: clamp(48px, 8vw, 104px);
+  line-height: 1.0;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 6px 0 22px;
+}
+.contact__intro .lede { margin-bottom: 36px; }
+.contact__socials { display: flex; flex-wrap: wrap; gap: 28px; }
+.contact__social {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+.contact__social svg { width: 14px; height: 14px; }
+.contact__social:hover { opacity: 0.65; }
+.contact__social:focus-visible { outline: 2px solid var(--cream); outline-offset: 4px; border-radius: 2px; }
+
+.contact__form {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--hairline);
+  border-radius: 24px;
+  padding: clamp(28px, 3.2vw, 52px);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.field { display: flex; flex-direction: column; }
+.field label {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 6px;
+  transition: color 0.2s ease;
+}
+.field:focus-within label { color: var(--cream); }
+.field input,
+.field textarea {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  color: var(--text);
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  padding: 12px 2px;
+  transition: border-color 0.25s ease;
+}
+.field textarea { resize: vertical; min-height: 96px; }
+.field input::placeholder,
+.field textarea::placeholder { color: var(--text-faint); opacity: 0.55; }
+.field input:focus,
+.field textarea:focus { outline: none; border-color: var(--cream); }
+.contact__submit { display: flex; justify-content: flex-end; padding-top: 6px; }
+.contact__submit .pill__icon { transition: transform 0.25s ease; }
+.contact__submit button:hover .pill__icon { transform: translateX(4px) translateY(-2px); }
+
+/* ============ LOCATION ============ */
+.location__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 6vw, 96px);
+  align-items: center;
+}
+.location__title {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 400;
+  font-size: clamp(28px, 3.4vw, 46px);
+  line-height: 1.15;
+  color: var(--text);
+  margin: 14px 0;
+}
+.location__info .body-text { margin-bottom: 28px; color: var(--text-dim); }
+.location__lines { display: flex; flex-direction: column; gap: 16px; }
+.location__line { display: flex; align-items: center; gap: 14px; color: var(--text-dim); font-size: 16px; }
+.location__line svg { width: 20px; height: 20px; color: var(--text-faint); flex-shrink: 0; }
+.location__time { color: var(--text); }
+.link-underline { color: var(--text); text-decoration: none; position: relative; }
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -2px;
+  width: 0; height: 1px;
+  background: currentColor;
+  transition: width 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+.link-underline:hover::after { width: 100%; }
+
+.location__media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+}
+.location__photo {
+  position: absolute;
+  inset: 0;
+  background-image: url("assets/hero-bg.jpeg");
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(1);
+  opacity: 0.45;
+}
+.location__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top right, var(--surface), transparent 60%);
+}
+.location__coords {
+  position: absolute;
+  left: 24px;
+  bottom: 22px;
+  z-index: 1;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--text);
+}
+
+/* ============ FOOTER ============ */
+.site-footer { background: var(--surface-alt); border-top: 1px solid var(--hairline); padding: 48px 0; }
+.site-footer__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.site-footer__brand {
+  font-family: "Cormorant Garamond", serif;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: 16px;
+  color: var(--text);
+  text-decoration: none;
+}
+.site-footer__nav { display: flex; gap: 28px; flex-wrap: wrap; }
+.site-footer__nav a { font-size: 13px; letter-spacing: 0.05em; color: var(--text-dim); text-decoration: none; transition: color 0.2s ease; }
+.site-footer__nav a:hover { color: var(--text); }
+.site-footer__copy { font-size: 12px; letter-spacing: 0.05em; color: var(--text-faint); }
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 900px) {
+  .about__grid { grid-template-columns: 1fr; }
+  .projects__grid { grid-template-columns: 1fr 1fr; }
+  .contact__grid { grid-template-columns: 1fr; }
+  .location__grid { grid-template-columns: 1fr; gap: 40px; }
+  .hobby-grid { grid-template-columns: 1fr; }
+  .hobby-card, .hobby-card--lg { grid-column: auto; height: clamp(320px, 64vw, 460px); }
+  .proj-featured { grid-template-columns: 1fr; }
+  .proj-pair { grid-template-columns: 1fr; gap: 48px; }
+  .proj-card--offset { margin-top: 0; }
+  .bento { grid-template-columns: repeat(2, 1fr); }
+  .bento__tile--lg { grid-column: span 2; }
+  .bento__quote { grid-column: span 2; min-height: 160px; }
+}
+
+@media (max-width: 600px) {
+  .brandmark { letter-spacing: 0.3em; text-indent: 0.3em; }
+  .contact-pill { display: none; }
+  .projects__grid { grid-template-columns: 1fr; }
+  .bento { grid-template-columns: 1fr; grid-auto-rows: 180px; }
+  .bento__tile--lg, .bento__tile--tall, .bento__quote { grid-column: span 1; grid-row: span 1; }
+  .site-footer__inner { flex-direction: column; text-align: center; }
+}
