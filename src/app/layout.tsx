@@ -72,10 +72,16 @@ export default function RootLayout({
       <head>
         {/* Apply the saved theme before first paint so there's no flash. Runs
             synchronously during HTML parsing (see Next's "Preventing Flash
-            before hydration" guide). Defaults to the server-rendered dark. */}
+            before hydration" guide). Defaults to the server-rendered dark.
+
+            Also take over scroll restoration: the app manages its own scroll
+            (experiences reset to the top on entry; the homepage lands on the
+            hobby panel via its hash). The browser's native restoration fires
+            AFTER those and would reopen an experience at a stale scroll
+            position — so switch it off up front. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`,
+            __html: `(function(){try{if("scrollRestoration" in history)history.scrollRestoration="manual";var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`,
           }}
         />
       </head>
