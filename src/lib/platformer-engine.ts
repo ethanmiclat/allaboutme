@@ -262,6 +262,31 @@ export class PlatformerEngine {
     this.grounded = false;
     this.collide(false);
 
+    // Ground rest: collide() only reacts to overlap, so a player sitting FLUSH
+    // on a floor (feet exactly on a tile boundary) isn't detected as colliding
+    // — gravity then sinks it a sub-pixel each step until it overlaps, snaps it
+    // back flush, and repeats, jittering ~1px forever. Snap to rest whenever the
+    // feet are flush against a solid tile just below (and not being launched).
+    if (!this.grounded && this.vy >= 0) {
+      // The tile row the feet sit in, and the flush rest position on its top.
+      const feetTile = Math.floor((this.py + PLAYER_H) / TILE);
+      const restY = feetTile * TILE - PLAYER_H;
+      const penetration = this.py - restY; // 0 = flush; collide() owns >= 1
+      if (penetration >= 0 && penetration < 1) {
+        const x0 = Math.floor(this.px / TILE);
+        const x1 = Math.floor((this.px + PLAYER_W - 1) / TILE);
+        for (let x = x0; x <= x1; x++) {
+          if (this.solid(this.tile(x, feetTile))) {
+            this.py = restY;
+            this.vy = 0;
+            this.grounded = true;
+            this.airJumps = this.ability.doubleJump ? 1 : 0;
+            break;
+          }
+        }
+      }
+    }
+
     // Bounce pads: landing on a '~' launches upward.
     if (this.grounded && wasFalling) {
       const padY = Math.floor((this.py + PLAYER_H + 1) / TILE);
