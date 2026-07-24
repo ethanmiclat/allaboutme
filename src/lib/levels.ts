@@ -67,7 +67,7 @@ export const LEVELS: GameLevel[] = [
     rank: "02",
     title: "Fortnite",
     mechanic: "THE STORM IS CLOSING — KEEP MOVING",
-    ability: { chaseWall: 115 },
+    ability: { chaseWall: 120 },
     grid: [
       ...Array.from({ length: 15 }, () => r(96)),
       r(96, [30, "*"], [55, "*"], [75, "*"]),
