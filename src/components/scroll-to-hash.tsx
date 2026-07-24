@@ -2,8 +2,25 @@
 
 import { useEffect, useLayoutEffect } from "react";
 
-/** Sections tracked for the URL hash, in document order. */
-const SECTION_IDS = ["home", "about", "hobbies", "projects", "contact", "location"];
+/**
+ * Sections tracked for the URL hash, in document order. The individual hobby
+ * covers are tracked too (they're sticky panels inside #hobbies): parked on a
+ * cover, the hash reads #hobby-<key>, so the browser's own Back button — which
+ * returns to whatever hash the homepage last had — re-lands on that exact
+ * cover, the same place the experiences' in-page Back links target.
+ */
+const SECTION_IDS = [
+  "home",
+  "about",
+  "hobbies",
+  "hobby-music",
+  "hobby-sports",
+  "hobby-games",
+  "hobby-films",
+  "projects",
+  "contact",
+  "location",
+];
 
 /**
  * Keeps the URL in sync with the section you're actually looking at.
@@ -33,14 +50,18 @@ export default function ScrollToHash() {
     // intermittent wrong landing), whereas offsetTop reports the untransformed
     // layout position. For the sticky hobby panels that flow position is exactly
     // the scroll offset at which the panel locks to the top of the viewport.
-    let top = 0;
-    for (
-      let node: HTMLElement | null = el;
-      node;
-      node = node.offsetParent as HTMLElement | null
-    ) {
-      top += node.offsetTop;
-    }
+    const measure = () => {
+      let top = 0;
+      for (
+        let node: HTMLElement | null = el;
+        node;
+        node = node.offsetParent as HTMLElement | null
+      ) {
+        top += node.offsetTop;
+      }
+      return top;
+    };
+    let top = measure();
 
     // Land immediately (pre-paint, so there's no flash of the top).
     window.scrollTo({ top, behavior: "instant" as ScrollBehavior });
@@ -74,6 +95,10 @@ export default function ScrollToHash() {
     };
     const hold = () => {
       if (done) return;
+      // Re-measure each frame: web fonts / images settling during the hold can
+      // shift the sections above the target, and a target computed once at
+      // mount would then land slightly short ("near" the right spot).
+      top = measure();
       const lenis = (window as unknown as { __lenis?: LenisLike }).__lenis;
       if (lenis) {
         // Lenis owns the scroll — set its internal target so it can't drift back.
@@ -110,10 +135,28 @@ export default function ScrollToHash() {
       ticking = false;
       // The section whose top has most recently passed a probe line a third of
       // the way down the viewport is the one being read.
+      //
+      // Positions come from the offsetTop chain against scrollY, NOT
+      // getBoundingClientRect: this handler runs in the same frame as the hero
+      // handoff's scroll handler but BEFORE it, so rects still reflect the
+      // previous frame's `.content` transform — after a fast jump that skews
+      // every rect by up to a viewport and the wrong hash sticks. offsetTop is
+      // transform-immune. (For a STUCK sticky hobby panel, Chrome's offsetTop
+      // reports the stuck position, making top - scrollY = 0 — i.e. "this
+      // panel is on screen now" — which is exactly the right answer here.)
       const probe = window.innerHeight * 0.35;
+      const y = window.scrollY;
       let activeId = sections[0].id;
       for (const s of sections) {
-        if (s.getBoundingClientRect().top <= probe) activeId = s.id;
+        let top = 0;
+        for (
+          let node: HTMLElement | null = s;
+          node;
+          node = node.offsetParent as HTMLElement | null
+        ) {
+          top += node.offsetTop;
+        }
+        if (top - y <= probe) activeId = s.id;
       }
       const first = !settled;
       settled = true;

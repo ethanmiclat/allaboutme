@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 
@@ -11,11 +11,20 @@ import Lenis from "lenis";
  *   drives its own pinned scroll.
  * - Routes in-page anchor links through Lenis for smooth jumps.
  * - Exposes window.__lenis and keeps GSAP ScrollTrigger in sync when present.
+ *
+ * This is a LAYOUT effect on purpose. As a passive effect, the outgoing
+ * route's Lenis survived past the incoming route's first paint (until the
+ * post-hydration effect flush — over a second on heavy pages in dev), and its
+ * RAF kept re-asserting its stale internal scroll onto the new page: entering
+ * an experience re-yanked you to the homepage's depth ("opens at the bottom"),
+ * and coming home the experience's ~0 yanked you to the hero. Layout effects
+ * clean up at commit, before the new page paints, so the old instance is dead
+ * before any of that can happen.
  */
 export default function SmoothScroll() {
   const pathname = usePathname();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (pathname === "/hobbies/music") return;
