@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { SHELVES, type Emblem, type Shelf, type Statue, type Trophy } from "@/lib/sports";
+import StatueScene from "@/components/ui/statue-scene";
 
 /**
  * Sports "Hall of Fame" (/hobbies/sports) — a full-screen takeover (like the
@@ -19,8 +20,42 @@ import { SHELVES, type Emblem, type Shelf, type Statue, type Trophy } from "@/li
  * Motion is CSS-driven and bypassed under prefers-reduced-motion (curtains open
  * immediately so the hall is shown straight away).
  */
+/** A trophy pulled into the focus view, with its resolved statue. */
+type FocusedTrophy = { trophy: Trophy; statue: Statue };
+
 export default function TrophyRoomExperience() {
   const [open, setOpen] = useState(false);
+  // The statue currently pulled into the centre focus view (or null).
+  const [focused, setFocused] = useState<FocusedTrophy | null>(null);
+  // True while the focus view plays its exit animation before unmounting.
+  const [closing, setClosing] = useState(false);
+  const closingRef = useRef(false);
+  const closeTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(closeTimer.current), []);
+
+  // Close the focus view through a short sink-and-fade (skipped under
+  // reduced motion); guarded so a second Esc/click mid-exit is a no-op.
+  const closeFocus = () => {
+    if (closingRef.current) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setFocused(null);
+      return;
+    }
+    closingRef.current = true;
+    setClosing(true);
+    closeTimer.current = window.setTimeout(() => {
+      closingRef.current = false;
+      setClosing(false);
+      setFocused(null);
+    }, 300);
+  };
+
+  // Arriving from the homepage's hobby stack (scrolled near the bottom), the
+  // old scroll position can survive the route change — land at the top before
+  // first paint so the reveal always starts on the curtains.
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Honor reduced-motion: skip the reveal and show the hall immediately. The
   // open is deferred into a timer (not set synchronously in the effect body).
@@ -30,19 +65,22 @@ export default function TrophyRoomExperience() {
     return () => window.clearTimeout(t);
   }, []);
 
-  // Enter parts the curtains; Esc re-closes them.
+  // Enter parts the curtains; Esc closes the focus view, then the curtains.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Enter" && !open) setOpen(true);
-      else if (e.key === "Escape" && open) setOpen(false);
+      else if (e.key === "Escape") {
+        if (focused) closeFocus();
+        else if (open) setOpen(false);
+      }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [open, focused]);
 
   return (
     <div className="trophy-page" data-open={open ? "" : undefined}>
-      <Link className="trophy-page__back" href="/#hobbies" scroll={false}>
+      <Link className="trophy-page__back" href="/#hobby-sports" scroll={false}>
         <ArrowLeft aria-hidden="true" />
         Back
       </Link>
@@ -53,17 +91,18 @@ export default function TrophyRoomExperience() {
         <div className="hall__glow" aria-hidden="true" />
         <div className="hall__inner">
           <header className="hall__header">
-            <p className="hall__kicker">Ethan Miclat</p>
+            <p className="hall__kicker">Ethan Miclat&rsquo;s</p>
             <h1 className="hall__title">Hall of Fame</h1>
-            <p className="hall__blurb">
-              The sports I play and watch, the teams I bleed for, and the players
-              I&rsquo;d stand in line for, all cast in gold.
-            </p>
           </header>
 
           <div className="hall__shelves">
             {SHELVES.map((shelf, i) => (
-              <ShelfRow key={shelf.category} shelf={shelf} index={i} />
+              <ShelfRow
+                key={shelf.category}
+                shelf={shelf}
+                index={i}
+                onSelect={setFocused}
+              />
             ))}
           </div>
         </div>
@@ -89,12 +128,29 @@ export default function TrophyRoomExperience() {
         </button>
       </div>
 
+      {focused && (
+        <TrophyFocus
+          trophy={focused.trophy}
+          statue={focused.statue}
+          closing={closing}
+          onClose={closeFocus}
+        />
+      )}
+
       <StatueDefs />
     </div>
   );
 }
 
-function ShelfRow({ shelf, index }: { shelf: Shelf; index: number }) {
+function ShelfRow({
+  shelf,
+  index,
+  onSelect,
+}: {
+  shelf: Shelf;
+  index: number;
+  onSelect: (f: FocusedTrophy) => void;
+}) {
   return (
     <section className="shelf" style={{ ["--si" as string]: index }}>
       <div className="shelf__row">
@@ -104,6 +160,7 @@ function ShelfRow({ shelf, index }: { shelf: Shelf; index: number }) {
             trophy={t}
             fallback={shelf.statue}
             index={i}
+            onSelect={onSelect}
           />
         ))}
       </div>
@@ -113,14 +170,54 @@ function ShelfRow({ shelf, index }: { shelf: Shelf; index: number }) {
   );
 }
 
+/** The statue / logo medallion / SVG figure a trophy displays — shared between
+    the shelf tiles and the focus view. */
+function TrophyMedia({
+  trophy,
+  statue,
+  interactive = false,
+}: {
+  trophy: Trophy;
+  statue: Statue;
+  interactive?: boolean;
+}) {
+  if (trophy.model)
+    return <StatueScene model={trophy.model} interactive={interactive} />;
+  if (trophy.logo) {
+    return (
+      <span className="trophy__medal" aria-hidden="true">
+        {trophy.logoTone === "fill" ? (
+          // Paint the logo silhouette with the trophy-gold gradient (mask).
+          <span
+            className="trophy__logo trophy__logo--fill"
+            style={{ ["--logo" as string]: `url(${trophy.logo})` }}
+          />
+        ) : (
+          // Strip the logo's colors to gold tones, keeping inner detail.
+          // eslint-disable-next-line @next/next/no-img-element -- small static logo; next/image adds no value here
+          <img
+            className="trophy__logo trophy__logo--duotone"
+            src={trophy.logo}
+            alt=""
+            draggable={false}
+          />
+        )}
+      </span>
+    );
+  }
+  return <StatueArt statue={statue} />;
+}
+
 function TrophyPiece({
   trophy,
   fallback,
   index,
+  onSelect,
 }: {
   trophy: Trophy;
   fallback: Statue;
   index: number;
+  onSelect: (f: FocusedTrophy) => void;
 }) {
   const statue = trophy.statue ?? fallback;
   // The badge defaults to the statue's sport (a baller gets a basketball badge);
@@ -128,40 +225,168 @@ function TrophyPiece({
   const emblem =
     trophy.emblem ?? (SPORT_STATUES.has(statue) ? (statue as Emblem) : undefined);
   return (
-    <article className="trophy" style={{ ["--i" as string]: index }}>
+    <button
+      type="button"
+      className={`trophy${trophy.wide ? " trophy--wide" : ""}`}
+      style={{ ["--i" as string]: index }}
+      onClick={() => onSelect({ trophy, statue })}
+      aria-haspopup="dialog"
+      aria-label={`Take a closer look at ${trophy.title}`}
+    >
       <span className="trophy__spot" aria-hidden="true" />
-      {trophy.logo ? (
-        <span className="trophy__medal" aria-hidden="true">
-          {trophy.logoTone === "fill" ? (
-            // Paint the logo silhouette with the trophy-gold gradient (mask).
-            <span
-              className="trophy__logo trophy__logo--fill"
-              style={{ ["--logo" as string]: `url(${trophy.logo})` }}
-            />
-          ) : (
-            // Strip the logo's colors to gold tones, keeping inner detail.
-            // eslint-disable-next-line @next/next/no-img-element -- small static logo; next/image adds no value here
-            <img
-              className="trophy__logo trophy__logo--duotone"
-              src={trophy.logo}
-              alt=""
-              draggable={false}
-            />
-          )}
-        </span>
-      ) : (
-        <StatueArt statue={statue} />
-      )}
+      <TrophyMedia trophy={trophy} statue={statue} />
       <span className="trophy__plinth" aria-hidden="true">
         <span className="trophy__plate">
           {emblem && <EmblemArt emblem={emblem} />}
           <span className="trophy__plate-text">
             <span className="trophy__title">{trophy.title}</span>
-            {trophy.sub && <span className="trophy__sub">{trophy.sub}</span>}
           </span>
         </span>
       </span>
-    </article>
+    </button>
+  );
+}
+
+/* ── Focus view: a statue pulled to centre stage ──────────────────────────── */
+
+/** One gold fleck of a polish burst. */
+type Spark = { tx: number; ty: number; d: number; s: number; r: number };
+
+/**
+ * Dialog overlay shown when a trophy is clicked: the statue takes centre stage
+ * (large, drag-to-turn) with its story on a wooden panel beside it. Clicking
+ * the statue "polishes" it — a burst of gold sparkles from the click point;
+ * drags that were clearly a turn, not a tap, don't sparkle.
+ */
+function TrophyFocus({
+  trophy,
+  statue,
+  closing,
+  onClose,
+}: {
+  trophy: Trophy;
+  statue: Statue;
+  closing: boolean;
+  onClose: () => void;
+}) {
+  const emblem =
+    trophy.emblem ?? (SPORT_STATUES.has(statue) ? (statue as Emblem) : undefined);
+  const [bursts, setBursts] = useState<
+    { id: number; x: number; y: number; sparks: Spark[] }[]
+  >([]);
+  const burstId = useRef(0);
+  const downAt = useRef({ x: 0, y: 0 });
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  // Move focus into the dialog and freeze the hall's scroll behind it.
+  useEffect(() => {
+    closeRef.current?.focus();
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
+  const polish = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // A horizontal drag is a turn, not a tap — no sparkles for those.
+    const moved = Math.hypot(
+      e.clientX - downAt.current.x,
+      e.clientY - downAt.current.y
+    );
+    if (moved > 8) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    // Keyboard "clicks" have no coordinates — burst from the statue's heart.
+    const fromKeyboard = e.clientX === 0 && e.clientY === 0;
+    const x = fromKeyboard ? rect.width / 2 : e.clientX - rect.left;
+    const y = fromKeyboard ? rect.height * 0.44 : e.clientY - rect.top;
+    const id = burstId.current++;
+    const sparks = Array.from({ length: 14 }, (): Spark => {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 70 + Math.random() * 130;
+      return {
+        tx: Math.cos(angle) * dist,
+        ty: Math.sin(angle) * dist * 0.8 - 30,
+        d: Math.random() * 0.18,
+        s: 8 + Math.random() * 14,
+        r: (Math.random() - 0.5) * 260,
+      };
+    });
+    setBursts((b) => [...b, { id, x, y, sparks }]);
+    // Sparks self-expire after the animation (0.9s + max 0.18s delay).
+    window.setTimeout(
+      () => setBursts((b) => b.filter((burst) => burst.id !== id)),
+      1200
+    );
+  };
+
+  return (
+    <div
+      className="trophy-focus"
+      data-closing={closing ? "" : undefined}
+      role="dialog"
+      aria-modal="true"
+      aria-label={trophy.title}
+    >
+      <button
+        type="button"
+        className="trophy-focus__backdrop"
+        aria-label="Close"
+        onClick={onClose}
+      />
+      <div className="trophy-focus__stage">
+        <button
+          type="button"
+          className="trophy-focus__statue"
+          onPointerDown={(e) => {
+            downAt.current = { x: e.clientX, y: e.clientY };
+          }}
+          onClick={polish}
+          aria-label={`Polish the ${trophy.title} statue`}
+        >
+          <TrophyMedia trophy={trophy} statue={statue} interactive />
+          {bursts.map((b) => (
+            <span
+              key={b.id}
+              className="trophy-focus__burst"
+              style={{ left: `${b.x}px`, top: `${b.y}px` }}
+              aria-hidden="true"
+            >
+              {b.sparks.map((s, i) => (
+                <span
+                  key={i}
+                  className="trophy-focus__spark"
+                  style={{
+                    ["--tx" as string]: `${s.tx}px`,
+                    ["--ty" as string]: `${s.ty}px`,
+                    ["--d" as string]: `${s.d}s`,
+                    ["--s" as string]: `${s.s}px`,
+                    ["--r" as string]: `${s.r}deg`,
+                  }}
+                />
+              ))}
+            </span>
+          ))}
+        </button>
+      </div>
+      <aside className="trophy-focus__panel">
+        <span className="trophy-focus__plate">
+          {emblem && <EmblemArt emblem={emblem} />}
+          <span className="trophy-focus__name">{trophy.title}</span>
+        </span>
+        {trophy.description && (
+          <p className="trophy-focus__desc">{trophy.description}</p>
+        )}
+        <button
+          ref={closeRef}
+          type="button"
+          className="trophy-focus__close"
+          onClick={onClose}
+        >
+          Back to the hall
+        </button>
+      </aside>
+    </div>
   );
 }
 

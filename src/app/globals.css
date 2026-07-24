@@ -22,7 +22,97 @@
   --text-faint: #818b95;
   --hairline: rgba(227, 230, 236, 0.12);
   --maxw: 1200px;
+  color-scheme: dark;
 }
+
+/* ============================================================
+   LIGHT MODE — flips the two signature colors: the slate-blue
+   surfaces become warm beige, and the beige accent becomes the
+   slate-blue. Almost everything on the reading page reads from
+   the tokens above, so overriding them here does the bulk of
+   the work. Toggled by `data-theme="light"` on <html> (set by
+   the no-flash inline script in layout.tsx). Immersive areas
+   that live over dark photos — the hero, the hobby panels — and
+   the deliberately-dark music takeover are re-locked to the dark
+   palette just below so they never invert.
+   ============================================================ */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --ink: #1d2730;
+  --ink-dim: rgba(29, 39, 48, 0.72);
+  --cream: #1d2730;          /* accent flips to deep slate-blue */
+  --cream-text: #f6ead2;     /* light text sits on the blue accent */
+  --dark: #f6ead2;           /* the former "dark" pill flips to beige */
+  --line: rgba(29, 39, 48, 0.4);
+
+  --surface: #f4ecdb;        /* warm paper */
+  --surface-alt: #ece0ca;    /* a deeper warm band for alt sections + footer */
+  --card: #fbf5e8;           /* card lifts slightly off the surface */
+  --text: #1d2730;           /* deep slate body text */
+  --text-dim: #4a5661;
+  --text-faint: #727d87;
+  --hairline: rgba(29, 39, 48, 0.14);
+}
+
+/* Keep the photo-backed / deliberately-dark areas on the dark palette even in
+   light mode, so their light text never turns dark over a dark image. The
+   project preview pane keeps its dark "screen" look, so it belongs here too. */
+[data-theme="light"] .hero,
+[data-theme="light"] .hobby-panel,
+[data-theme="light"] .music-page,
+[data-theme="light"] .folder__preview {
+  --ink: #ffffff;
+  --ink-dim: rgba(255, 255, 255, 0.78);
+  --cream: #f6ead2;
+  --cream-text: #2b2419;
+  --dark: #1d2730;
+  --line: rgba(255, 255, 255, 0.55);
+  --surface: #141b22;
+  --surface-alt: #0e141a;
+  --card: #1a222b;
+  --text: #e3e6ec;
+  --text-dim: #aab4bd;
+  --text-faint: #818b95;
+  --hairline: rgba(227, 230, 236, 0.12);
+}
+
+/* Floating chrome (menu button + theme toggle) sits over the dark hero AND the
+   beige content, so in light mode it becomes a dark glass pill with dark marks
+   that reads on both. */
+[data-theme="light"] .menu-btn,
+[data-theme="light"] .theme-toggle {
+  background: rgba(29, 39, 48, 0.10);
+  border-color: rgba(29, 39, 48, 0.28);
+}
+[data-theme="light"] .menu-btn:hover,
+[data-theme="light"] .theme-toggle:hover {
+  background: rgba(29, 39, 48, 0.18);
+  border-color: rgba(29, 39, 48, 0.55);
+}
+[data-theme="light"] .menu-btn:focus-visible,
+[data-theme="light"] .theme-toggle:focus-visible,
+[data-theme="light"] .content .pill:focus-visible {
+  outline-color: #1d2730;
+}
+/* The full-screen menu overlay flips to a warm scrim (its links use --ink). */
+[data-theme="light"] .menu { background: rgba(244, 236, 219, 0.88); }
+/* Pill hovers are hard-coded, so re-point them after the swap (content only —
+   the hero's dark pill must keep its dark hover). */
+[data-theme="light"] .content .pill--cream:hover { background: #28333d; }
+[data-theme="light"] .content .pill--dark:hover { background: #fbf2df; }
+/* The glass contact form needs a touch more body on a light surface. */
+[data-theme="light"] .contact__form { background: rgba(255, 255, 255, 0.5); }
+/* The active/hovered folder tab keeps its dark "selected" fill (#1e2833), so its
+   text has to stay light — otherwise the slate title vanishes on the dark tab. */
+[data-theme="light"] .folder-tab[data-active] {
+  --text: #f4ecdb;
+  --text-dim: rgba(244, 236, 219, 0.82);
+  --text-faint: rgba(244, 236, 219, 0.62);
+}
+/* Drop the corner wash over the location photo in light mode — it reads as a
+   muddy beige gradient on the now-vivid image. */
+[data-theme="light"] .location__media::after { display: none; }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -30,13 +120,24 @@
    native behavior stays "auto". This keeps cross-page hash links like the hobby
    "Back" button (→ /#hobbies) landing directly on the section instead of
    animating a scroll down from the top. */
-html { scroll-behavior: auto; }
+html {
+  scroll-behavior: auto;
+  /* The scrolling element is <html>, so the hero handoff's off-screen parking
+     spot has to be clipped here — clipping only <body> still leaves the page
+     draggable sideways. `clip` (not `hidden`) creates no scroll container, so
+     sticky positioning and ScrollTrigger are unaffected. */
+  overflow-x: clip;
+}
 
 body {
   font-family: var(--font-inter), system-ui, sans-serif;
   background: var(--dark);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
+  /* The hero handoff parks the content one screen to the right before sliding
+     it in; clip (not hidden) so that never becomes a horizontal scrollbar and
+     no scroll container is created to fight sticky/ScrollTrigger. */
+  overflow-x: clip;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -58,6 +159,41 @@ body {
 
 /* Hero foreground layers fade out on scroll; background stays put (driven by JS) */
 .topbar, .hero__center, .hero__footer { will-change: opacity; }
+
+/* ---- Hero handoff: the page moves SIDEWAYS, not down ----
+   For the first viewport of scrolling nothing travels vertically. The hero
+   slides off to the left while the content slides in from the right, both
+   scrubbed by `--hero-exit` (0→1, set by hero.tsx).
+
+   How the vertical hold works: `.hero-runway` is two viewports tall, so the
+   sticky hero stays pinned through the whole handoff. `.content` is pulled up
+   one viewport with a negative margin, putting its natural top exactly at
+   scrollY = 100dvh — the moment the handoff ends. Until then hero.tsx cancels
+   the remaining offset with a matching translateY, so the content sits still
+   at the top of the screen and only its X changes. At the end both the X and Y
+   offsets reach zero simultaneously, so normal vertical scrolling resumes with
+   no jump.
+
+   Reduced-motion users get none of this: without the media query the runway is
+   just the hero's own height and the content keeps its normal flow position. */
+:root { --hero-exit: 0; }
+
+.hero-runway { position: relative; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-runway { height: 200dvh; }
+  .content {
+    margin-top: -100dvh;
+    will-change: transform;
+  }
+  .hero {
+    /* Slides fully offstage left; kept mostly opaque so it reads as travel
+       rather than a dissolve. */
+    transform: translate3d(calc(var(--hero-exit) * -100%), 0, 0);
+    opacity: calc(1 - var(--hero-exit) * 0.4);
+    will-change: transform, opacity;
+  }
+}
 
 /* Content layer that scrolls up and takes over the hero */
 .content {
@@ -102,19 +238,6 @@ body {
   padding: 30px clamp(20px, 4vw, 56px);
 }
 
-.brandmark {
-  font-family: var(--font-cormorant), serif;
-  font-weight: 400;
-  font-size: clamp(20px, 2vw, 28px);
-  letter-spacing: 0.31em;
-  text-transform: uppercase;
-  color: var(--ink);
-  text-decoration: none;
-  text-indent: 0.31em;            /* optical centering for tracked caps */
-  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.3);
-  white-space: nowrap;
-}
-
 .menu-btn {
   position: fixed;
   top: 30px;
@@ -144,6 +267,39 @@ body {
 }
 .menu-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 
+/* ---------- THEME TOGGLE (sits to the left of the menu button) ---------- */
+.theme-toggle {
+  position: fixed;
+  top: 30px;
+  /* One menu-button width (56px) + a 14px gap to its left. */
+  right: calc(clamp(20px, 4vw, 56px) + 70px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+.theme-toggle:hover { background: rgba(255, 255, 255, 0.16); border-color: #fff; }
+.theme-toggle:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+  /* A soft rotate/fade as the icon swaps between sun and moon. */
+  animation: themeIconIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes themeIconIn {
+  from { opacity: 0; transform: rotate(-90deg) scale(0.6); }
+  to   { opacity: 1; transform: none; }
+}
+
 /* hamburger -> X when open */
 body.menu-open .menu-btn span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
 body.menu-open .menu-btn span:nth-child(2) { opacity: 0; }
@@ -153,42 +309,52 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-6.5px) rotat
 .hero__center {
   position: relative;
   z-index: 3;
-  margin: auto;
-  text-align: center;
+  /* Sit up top, centered directly under the "Ethan Miclat" brandmark; the auto
+     bottom margin lets the rest of the frame (and Ethan) breathe below. */
+  margin-top: clamp(60px, 16vh, 180px);
+  margin-bottom: auto;
+  align-self: center;
+  max-width: min(1200px, 92vw);
   padding: 0 clamp(20px, 6vw, 80px);
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: clamp(28px, 4vh, 44px);
 }
 
+/* Main header: the name, in the site's serif tracked caps (a scaled-up version
+   of the old top brandmark), centered in the upper third of the frame. */
 .hero__title {
-  /* Now a hand-signature SVG (see .hero__sign) rather than text. */
   margin: 0;
-  color: rgba(255, 255, 255, 0.95);
-  filter: drop-shadow(0 2px 22px rgba(0, 0, 0, 0.35));
+  font-family: var(--font-cormorant), serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  text-indent: 0.14em;             /* optical centering for tracked caps */
+  font-size: clamp(30px, 5.6vw, 78px);
+  line-height: 1.12;
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.35);
+  /* Entrance: rises out of a blur while the letter tracking settles in. */
+  animation: heroTitleIn 1.7s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-.hero__sign {
-  display: block;
-  width: clamp(280px, 60vw, 760px);
-  height: auto;
-  overflow: visible;
-}
-/* The visible ink: the real filled Dancing Script glyph outlines. The write-on
-   is a single clip frontier swept in hero.tsx — the glyphs are the solid font
-   letterforms, so the reveal can never fragment or notch. */
-.hero__sign-fill {
-  fill: currentColor;
-}
-/* The same outlines stroked, for a crisp inked edge as the frontier passes.
-   Its stroke-dasharray/offset are driven from the SAME frontier value as the
-   fill clip (set in JS), so ink and body can't desync. */
-.hero__sign-ink {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+
+@keyframes heroTitleIn {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+    letter-spacing: 0.34em;
+    text-indent: 0.34em;
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    letter-spacing: 0.14em;
+    text-indent: 0.14em;
+    filter: blur(0);
+  }
 }
 
 /* ---------- PILLS ---------- */
@@ -345,6 +511,40 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
 }
 .section--alt { background: var(--surface-alt); }
 
+/* Ambient aurora: two faint glows (warm cream up top, cool slate below)
+   that give the flat surfaces some depth. Static, so it costs nothing. */
+.section--glow { overflow: clip; }
+.section--glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(620px 400px at 86% 2%, rgba(246, 234, 210, 0.05), transparent 70%),
+    radial-gradient(720px 460px at 2% 98%, rgba(96, 138, 178, 0.07), transparent 70%);
+}
+.section--glow > * { position: relative; }
+
+/* ============ FILM GRAIN (whole-page wash) ============ */
+/* Fixed + non-interactive per perf rules; the jitter moves the layer with a
+   transform only, so nothing repaints. */
+.grain {
+  position: fixed;
+  inset: -120px;
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grainJitter 1.6s steps(4) infinite;
+}
+@keyframes grainJitter {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(-42px, 26px, 0); }
+  50%  { transform: translate3d(30px, -38px, 0); }
+  75%  { transform: translate3d(-20px, -24px, 0); }
+  100% { transform: translate3d(36px, 34px, 0); }
+}
+
 .container {
   width: 100%;
   max-width: var(--maxw);
@@ -409,6 +609,31 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
   border: 1px solid var(--hairline);
 }
 
+/* Tilt wrapper: tilt-portrait.tsx drives the --tilt-* vars from the pointer;
+   the transition smooths each update and the ease back to rest. */
+.tilt { perspective: 900px; }
+.tilt__inner {
+  position: relative;
+  border-radius: 24px;
+  transform: rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.tilt__shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  pointer-events: none;
+  background: radial-gradient(
+    440px circle at var(--tilt-mx, 50%) var(--tilt-my, 50%),
+    rgba(246, 234, 210, 0.13),
+    transparent 62%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.tilt:hover .tilt__shine { opacity: 1; }
+
 .card {
   background: var(--card);
   border: 1px solid var(--hairline);
@@ -441,7 +666,21 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
   letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--text-faint); margin-bottom: 32px;
 }
-.timeline__list { list-style: none; position: relative; padding-left: 28px; border-left: 1px solid var(--hairline); }
+.timeline__list { list-style: none; position: relative; padding-left: 28px; }
+/* The spine draws itself downward when the timeline scrolls into view. */
+.timeline__list::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, rgba(246, 234, 210, 0.55), var(--hairline));
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+}
+.js .timeline.is-visible .timeline__list::before { transform: scaleY(1); }
 .timeline__item { position: relative; padding-bottom: 36px; }
 .timeline__item:last-child { padding-bottom: 0; }
 .timeline__dot {
@@ -450,80 +689,19 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
   background: var(--text-faint);
   box-shadow: 0 0 0 6px var(--surface);
 }
+/* Dots ignite one after another as the spine reaches them. */
+.js .timeline .timeline__dot { transform: scale(0); transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.js .timeline.is-visible .timeline__dot { transform: scale(1); }
+.js .timeline.is-visible .timeline__item:nth-child(1) .timeline__dot { transition-delay: 0.25s; }
+.js .timeline.is-visible .timeline__item:nth-child(2) .timeline__dot { transition-delay: 0.7s; }
+.js .timeline.is-visible .timeline__item:nth-child(3) .timeline__dot { transition-delay: 1.15s; }
 .timeline__dot--active { background: var(--cream); }
 .timeline__time { display: block; font-size: 12px; letter-spacing: 0.06em; color: var(--text-faint); margin-bottom: 6px; }
 .timeline__title { font-family: var(--font-cormorant), serif; font-style: italic; font-weight: 400; font-size: 24px; color: var(--text); margin-bottom: 6px; }
 .timeline__text { font-size: 14px; line-height: 1.6; color: var(--text-dim); }
 
 /* ============ PROJECTS ============ */
-.projects__grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(20px, 2.4vw, 32px);
-}
-.project-card {
-  background: var(--card);
-  border: 1px solid var(--hairline);
-  border-radius: 24px;
-  padding: 16px;
-  transition: transform 0.3s ease, border-color 0.3s ease;
-}
-.project-card:hover { transform: translateY(-4px); border-color: rgba(246, 234, 210, 0.4); }
-.project-card__thumb {
-  aspect-ratio: 4 / 3;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #232e38, #161d24);
-  margin-bottom: 18px;
-}
-.project-card__title { font-family: var(--font-cormorant), serif; font-style: italic; font-size: 24px; padding: 0 6px; margin-bottom: 6px; color: var(--text); }
-.project-card__meta { font-size: 14px; line-height: 1.6; color: var(--text-dim); padding: 0 6px 8px; }
-
 .projects__actions { display: flex; justify-content: center; gap: 14px; margin-top: clamp(40px, 6vh, 64px); flex-wrap: wrap; }
-
-/* ============ HOBBIES (BENTO) ============ */
-.bento {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: 200px;
-  gap: clamp(16px, 1.6vw, 24px);
-}
-.bento__tile {
-  position: relative;
-  border-radius: 24px;
-  border: 1px solid var(--hairline);
-  background: linear-gradient(135deg, #202a33, #141b22);
-  display: flex;
-  align-items: flex-end;
-  padding: 24px;
-  overflow: hidden;
-}
-.bento__tile--lg { grid-column: span 2; grid-row: span 2; }
-.bento__tile--tall { grid-column: span 1; grid-row: span 2; }
-.bento__label {
-  font-family: var(--font-cormorant), serif;
-  font-style: italic;
-  font-size: 26px;
-  color: var(--text);
-}
-.bento__quote {
-  grid-column: span 1;
-  background: var(--card);
-  align-items: center;
-  text-align: center;
-}
-.bento__quote p {
-  font-family: var(--font-cormorant), serif;
-  font-style: italic;
-  font-size: 19px;
-  line-height: 1.5;
-  color: var(--text-dim);
-}
-
-/* ============ CONTACT ============ */
-.contact__inner { text-align: center; display: flex; flex-direction: column; align-items: center; }
-.contact__inner .eyebrow { text-align: center; }
-.contact__lede { margin: 18px auto 0; }
-.contact__actions { display: flex; gap: 14px; margin-top: 36px; flex-wrap: wrap; justify-content: center; }
 
 /* Ghost pill for dark section backgrounds */
 .pill--ghost {
@@ -533,81 +711,182 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
 }
 .pill--ghost:hover { transform: translateY(-2px); border-color: rgba(246, 234, 210, 0.5); background: rgba(255, 255, 255, 0.04); }
 
-/* ============ HOBBIES (editorial bento) ============ */
-.hobby-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: clamp(16px, 1.8vw, 28px);
-}
-.hobby-card {
+/* ============ HOBBIES (sticky scroll-stack) ============ */
+/* Each hobby is a full-height panel pinned with position: sticky; the next
+   panel scrolls up and covers it. The stack is `n` panels tall in normal flow,
+   so scrolling the section walks through every hobby. */
+.hobby-stack {
   position: relative;
-  grid-column: span 4;
-  height: clamp(340px, 40vw, 540px);
-  border-radius: 24px;
-  overflow: hidden;
-  border: 1px solid var(--hairline);
-  /* now a <button> that opens a detail view */
-  display: block;
-  width: 100%;
-  text-align: left;
-  color: inherit;
-  font: inherit;
-  background: none;
-  -webkit-appearance: none;
-  appearance: none;
-  cursor: pointer;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  background: #0a0e12;
 }
-.hobby-card:hover { transform: translateY(-4px); border-color: rgba(246, 234, 210, 0.4); }
-.hobby-card:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
-.hobby-card--lg { grid-column: span 8; }
-.hobby-card__media {
+.hobby-panel {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  display: block;
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  /* Later panels sit above earlier ones so each one covers the last. */
+  background: #0a0e12;
+}
+
+.hobby-panel__media {
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, #232e38, #141b22);
-  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(1.06);
+  transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.hobby-card:hover .hobby-card__media { transform: scale(1.05); }
-.hobby-card__media--music {
-  background: #141b22 url("/assets/music-cover.jpeg") center / cover no-repeat;
+/* Media settles from a slight zoom as the panel enters. */
+.hobby-panel[data-shown] .hobby-panel__media { transform: scale(1); }
+.hobby-panel:hover .hobby-panel__media { transform: scale(1.04); }
+.hobby-panel__media--music {
+  background: #141b22 url("/assets/music-cover.jpg") center / cover no-repeat;
 }
-.hobby-card::after {
-  content: "";
+.hobby-panel__media--games {
+  background: #0d0d0d url("/assets/games-cover.jpg") center 30% / cover no-repeat;
+}
+.hobby-panel__media--sports {
+  background: #16261f url("/assets/sports-cover.jpg") center / cover no-repeat;
+}
+.hobby-panel__media--films {
+  background: #250a0c url("/assets/films-cover.jpg") center / cover no-repeat;
+}
+.hobby-panel__scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(10, 14, 18, 0.92) 0%, rgba(10, 14, 18, 0.25) 55%, transparent 100%);
+  background:
+    radial-gradient(90% 75% at 50% 52%, rgba(8, 11, 15, 0.12), rgba(8, 11, 15, 0.62) 80%),
+    linear-gradient(to top, rgba(8, 11, 15, 0.82) 0%, rgba(8, 11, 15, 0.12) 46%, rgba(8, 11, 15, 0.34) 100%);
 }
-.hobby-card__body {
+.hobby-panel__body {
   position: absolute;
-  left: 0; bottom: 0;
+  inset: 0;
   z-index: 1;
-  padding: clamp(24px, 3vw, 44px);
-  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 clamp(24px, 8vw, 120px);
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease 0.1s,
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
 }
-.hobby-card__icon { display: inline-flex; color: var(--cream); margin-bottom: 14px; }
-.hobby-card__icon svg { width: 22px; height: 22px; }
-.hobby-card__title {
+.hobby-panel[data-shown] .hobby-panel__body,
+.hobby-panel--intro .hobby-panel__body { opacity: 1; transform: none; }
+
+.hobby-panel__index {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 22px;
+}
+.hobby-panel__index-sep { margin: 0 6px; opacity: 0.5; }
+.hobby-panel__title {
   font-family: var(--font-cormorant), serif;
   font-weight: 400;
-  font-size: clamp(26px, 2.6vw, 40px);
+  font-size: clamp(46px, 8vw, 108px);
+  line-height: 1.02;
   color: var(--text);
-  margin-bottom: 10px;
+  margin: 0;
 }
-.hobby-card__text { font-size: 15px; line-height: 1.65; color: var(--text-dim); }
-.hobby-card__cta {
+.hobby-panel__tag {
+  font-family: var(--font-cormorant), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(18px, 2.4vw, 26px);
+  color: rgba(246, 234, 210, 0.82);
+  margin: 14px 0 0;
+}
+.hobby-panel__cta {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 18px;
+  gap: 10px;
+  margin-top: 34px;
   font-family: var(--font-inter), sans-serif;
   font-size: 12px;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--cream);
 }
-.hobby-card__cta svg { width: 16px; height: 16px; transition: transform 0.3s ease; }
-.hobby-card:hover .hobby-card__cta svg { transform: translateX(5px); }
+.hobby-panel__cta svg { width: 16px; height: 16px; transition: transform 0.3s ease; }
+.hobby-panel:hover .hobby-panel__cta svg { transform: translateX(6px); }
+
+/* Intro panel — the first panel, introducing the section (not a link). Its
+   cover is a still life of one emblem per hobby under a warm spotlight. */
+.hobby-panel--intro { cursor: default; }
+.hobby-panel__media--intro {
+  background: #12181f url("/assets/intro-cover.jpg") center / cover no-repeat;
+}
+.hobby-panel--intro .eyebrow { color: var(--cream); margin-bottom: 18px; }
+.hobby-panel__title--intro {
+  font-size: clamp(38px, 6.4vw, 92px);
+  line-height: 1.05;
+  white-space: nowrap;
+}
+.hobby-panel__hint {
+  margin-top: 30px;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  animation: hobbyHintPulse 2.4s ease-in-out infinite;
+}
+@keyframes hobbyHintPulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.85; }
+}
+
+/* The quote sits in its own padded band below the stack. */
+.hobbies__outro {
+  padding-top: clamp(56px, 9vh, 110px);
+  padding-bottom: clamp(56px, 9vh, 110px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hobby-panel__media,
+  .hobby-panel__body { transition: none; }
+  .hobby-panel__media { transform: scale(1); }
+  .hobby-panel__body { opacity: 1; transform: none; }
+  .hobby-panel__hint { animation: none; }
+}
+
+/* ---- Sports transition ----
+   Clicking the Sports panel lets it gently sway and fade before the route
+   change hands off into the Hall of Fame page (which fades in). The panel
+   itself stays opaque (its own solid background keeps the Music panel
+   stacked beneath it covered) — only the media and body fade/sway, so
+   nothing shows through underneath. */
+.hobby-panel[data-entering] { pointer-events: none; }
+.hobby-panel[data-entering] .hobby-panel__media,
+.hobby-panel[data-entering] .hobby-panel__body {
+  animation:
+    hobbyEnterSway 0.32s cubic-bezier(0.37, 0, 0.3, 1) forwards,
+    hobbyEnterFade 0.3s ease forwards;
+}
+@keyframes hobbyEnterFade {
+  to { opacity: 0; }
+}
+/* A soft settle: lean one way, ease back, with a hair of zoom so the rotation
+   never uncovers a corner. */
+@keyframes hobbyEnterSway {
+  0% { transform: rotate(0deg) scale(1); }
+  40% { transform: rotate(-0.9deg) scale(1.02); }
+  100% { transform: rotate(0.4deg) scale(1.035); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hobby-panel[data-entering] .hobby-panel__media,
+  .hobby-panel[data-entering] .hobby-panel__body { animation: none; }
+}
 
 /* ============ HOBBY PAGE ENTRANCE ============ */
 /* Shared by the standalone hobby takeovers (music/games/films/sports).
@@ -624,6 +903,43 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
   background: var(--surface);
   min-height: 100dvh;
   animation: hobbyPageIn 0.5s ease both;
+}
+
+/* Full-bleed ambient backdrop: two soft gradient blobs drifting very slowly
+   behind the album columns. Fixed (never transformed) so it can't interfere
+   with the carousel's ScrollTrigger pin; content stacks above via z-index. */
+.music-page__bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* Emerald wash matching the section's cover (a stadium of green lightsticks). */
+  background:
+    radial-gradient(42% 34% at 22% 24%, rgba(110, 232, 180, 0.12), transparent 70%),
+    radial-gradient(50% 40% at 80% 72%, rgba(32, 148, 118, 0.13), transparent 72%),
+    radial-gradient(36% 30% at 62% 12%, rgba(70, 190, 172, 0.08), transparent 75%),
+    var(--surface);
+  background-size: 160% 160%;
+  animation: musicBgDrift 36s ease-in-out infinite alternate;
+}
+@keyframes musicBgDrift {
+  from { background-position: 0% 0%; }
+  to   { background-position: 100% 100%; }
+}
+/* Interactive sound-wave canvas (MusicBackground) — above the gradient wash,
+   below the albums. */
+.music-page__waves {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.music-page__intro,
+.albums-carousel {
+  position: relative;
+  z-index: 1;
 }
 .music-page__back {
   position: fixed;
@@ -690,6 +1006,11 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
 }
 
 /* ============ PROJECTS (editorial) ============ */
+/* The folder is a wide showcase, so let this one section use more of the
+   page than the standard container — heading, folder, and actions stay
+   aligned because they widen together. */
+.projects .container { max-width: 1360px; }
+
 .section__head--left { text-align: left; }
 .section__head--left .eyebrow { text-align: left; }
 .projects__headline {
@@ -701,118 +1022,218 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
   color: var(--text);
 }
 
-.projects__list {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(64px, 11vh, 150px);
+/* ---- Project folder: file-divider tabs flank a centered preview sheet.
+   Half the tabs sit on the left, half on the right; the preview is in the
+   middle. Hover / focus / click a tab and its sheet crossfades in, playing
+   that project's screen recording. ---- */
+.folder {
+  display: grid;
+  grid-template-columns: 4fr 7fr 4fr;
+  gap: clamp(20px, 2vw, 34px);
+  align-items: start;
   margin-top: clamp(48px, 7vh, 90px);
 }
 
-/* Reusable media frame */
-.proj-media {
+.folder__tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 13px; /* room for the divider tabs sticking up */
+}
+
+.folder-tab {
+  /* Both the button body and its divider tab read these, so the active
+     state recolors them together. */
+  --tab-bg: var(--card);
+  --tab-line: var(--hairline);
   position: relative;
-  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  background: var(--tab-bg);
+  border: 1px solid var(--tab-line);
+  border-radius: 16px;
+  padding: 20px 24px;
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.3s ease, border-color 0.3s ease;
+}
+/* The file-divider tab on top; staggered per slot like a real drawer. */
+.folder-tab::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 22px;
+  width: 84px;
+  height: 13px; /* overlaps the button's top border to hide the seam */
+  background: var(--tab-bg);
+  border: 1px solid var(--tab-line);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+.folder-tab:nth-child(2)::before { left: calc(22px + 42px); }
+.folder-tab:nth-child(3)::before { left: calc(22px + 84px); }
+
+.folder-tab:hover { --tab-line: rgba(246, 234, 210, 0.28); }
+.folder-tab[data-active] {
+  --tab-bg: #1e2833;
+  --tab-line: rgba(246, 234, 210, 0.42);
+  transform: translateX(10px);
+}
+.folder-tab:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
+
+/* Right-hand column mirrors the left: text and divider tabs on the right edge,
+   and the active tab slides toward the centered preview. */
+.folder__tabs--right .folder-tab { text-align: right; align-items: flex-end; }
+.folder__tabs--right .folder-tab::before { left: auto; right: 22px; }
+.folder__tabs--right .folder-tab:nth-child(2)::before {
+  left: auto;
+  right: calc(22px + 42px);
+}
+.folder__tabs--right .folder-tab:nth-child(3)::before {
+  left: auto;
+  right: calc(22px + 84px);
+}
+.folder__tabs--right .folder-tab[data-active] { transform: translateX(-10px); }
+
+.folder-tab__meta {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.folder-tab__name {
+  font-family: var(--font-cormorant), serif;
+  font-size: clamp(24px, 2.4vw, 32px);
+  line-height: 1.1;
+  color: var(--text);
+}
+.folder-tab__blurb { font-size: 14px; line-height: 1.55; color: var(--text-dim); }
+.folder-tab[data-placeholder] .folder-tab__name { font-style: italic; color: var(--text-dim); }
+
+/* Preview pane: the open folder the active sheet sits in. Its height is set
+   in JS to hug the ACTIVE sheet (project-folder.tsx), so the outline always
+   ends just under that sheet's "Visit Site" link — the grid stack alone would
+   size it to the tallest sheet instead. */
+.folder__preview {
+  display: grid; /* sheets stack in the same cell */
+  align-items: start;
+  overflow: hidden; /* taller inactive sheets must not poke past the box */
+  background: linear-gradient(160deg, #1b242d, #151d25);
+  border: 1px solid var(--hairline);
+  border-radius: 20px;
+  padding: clamp(16px, 2vw, 28px);
+  transition: height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.folder-sheet {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.folder-sheet[data-active] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.folder-sheet__media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--hairline);
-}
-.proj-media--16x9 { aspect-ratio: 16 / 9; }
-.proj-media--4x5 { aspect-ratio: 4 / 5; }
-.proj-media--21x9 { aspect-ratio: 21 / 9; }
-.proj-media__img {
-  position: absolute;
-  inset: 0;
   background: linear-gradient(135deg, #243039, #141b22);
-  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.proj-media__video {
+.folder-sheet__media video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
-article:hover .proj-media__img,
-article:hover .proj-media__video { transform: scale(1.05); }
+.folder-sheet__empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 0 24px;
+}
+.folder-sheet__empty-title {
+  font-family: var(--font-cormorant), serif;
+  font-size: clamp(24px, 2.6vw, 34px);
+}
+.folder-sheet__empty-text { font-size: 13px; color: var(--text-faint); }
 
-.proj__meta {
+.folder-sheet__info { padding: clamp(18px, 2vw, 26px) 6px 4px; }
+.folder-sheet__meta {
   display: block;
-  font-size: 12px;
-  letter-spacing: 0.16em;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--text-faint);
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
-.proj__title {
+.folder-sheet__title {
   font-family: var(--font-cormorant), serif;
   font-weight: 400;
-  font-size: clamp(28px, 3vw, 46px);
+  font-size: clamp(26px, 2.8vw, 40px);
   line-height: 1.1;
   color: var(--text);
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
-.proj__title--lg { font-size: clamp(34px, 4.5vw, 64px); }
-.proj__desc { font-size: 16px; line-height: 1.7; color: var(--text-dim); max-width: 46ch; }
-
-.proj__link {
+.folder-sheet__desc { font-size: 15px; line-height: 1.7; color: var(--text-dim); max-width: 52ch; }
+/* Small "this is just a demo" disclaimer under the description. */
+.folder-sheet__note {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  max-width: 52ch;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(246, 234, 210, 0.16);
+  border-radius: 12px;
+  background: rgba(246, 234, 210, 0.05);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+.folder-sheet__note-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--text-faint);
+}
+.folder-sheet__link {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-top: 22px;
-  color: var(--text);
-  text-decoration: none;
-  font-size: 14px;
-  letter-spacing: 0.04em;
-  transition: gap 0.3s ease;
-}
-.proj__link svg { width: 18px; height: 18px; }
-.proj__link:hover { gap: 18px; }
-.proj__link-underline {
-  display: inline-block;
   margin-top: 18px;
   color: var(--text);
   text-decoration: none;
   font-size: 14px;
-  padding-bottom: 3px;
-  border-bottom: 1px solid var(--hairline);
-  transition: border-color 0.25s ease;
+  letter-spacing: 0.04em;
+  transition: gap 0.3s ease, color 0.25s ease;
 }
-.proj__link-underline:hover { border-color: var(--cream); }
-
-/* Featured */
-.proj-featured {
-  display: grid;
-  grid-template-columns: 8fr 4fr;
-  gap: clamp(28px, 3.5vw, 56px);
-  align-items: center;
-}
-
-/* Staggered pair */
-.proj-pair {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(28px, 4vw, 64px);
-  align-items: start;
-}
-.proj-card .proj-media { margin-bottom: 22px; }
-.proj-card--offset { margin-top: clamp(0px, 7vw, 110px); }
-
-/* Full-width narrative */
-.proj-wide { position: relative; }
-.proj-wide .proj-media::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(8, 12, 16, 0.9) 0%, rgba(8, 12, 16, 0.2) 55%, transparent 100%);
-}
-.proj-wide__info {
-  position: absolute;
-  left: 0; bottom: 0;
-  z-index: 2;
-  padding: clamp(24px, 4vw, 64px);
-  max-width: 620px;
-}
+.folder-sheet__link svg { width: 18px; height: 18px; }
+.folder-sheet__link:hover { gap: 18px; color: var(--cream); }
+.folder-sheet__link:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
 
 /* CTA */
 .projects__cta {
@@ -953,11 +1374,10 @@ article:hover .proj-media__video { transform: scale(1.05); }
 .location__photo {
   position: absolute;
   inset: 0;
-  background-image: url("/assets/hero-bg.jpeg");
+  background-image: url("/assets/location-photo.jpeg");
   background-size: cover;
   background-position: center;
-  filter: grayscale(1);
-  opacity: 0.45;
+  opacity: 0.78;
 }
 .location__media::after {
   content: "";
@@ -972,7 +1392,10 @@ article:hover .proj-media__video { transform: scale(1.05); }
   z-index: 1;
   font-size: 12px;
   letter-spacing: 0.12em;
-  color: var(--text);
+  /* Always white — the coords sit directly on the photo in both themes now that
+     the gradient wash is gone; a soft shadow keeps them legible on bright spots. */
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
 }
 
 /* ============ FOOTER ============ */
@@ -994,25 +1417,27 @@ article:hover .proj-media__video { transform: scale(1.05); }
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 900px) {
   .about__grid { grid-template-columns: 1fr; }
-  .projects__grid { grid-template-columns: 1fr 1fr; }
   .contact__grid { grid-template-columns: 1fr; }
   .location__grid { grid-template-columns: 1fr; gap: 40px; }
-  .hobby-grid { grid-template-columns: 1fr; }
-  .hobby-card, .hobby-card--lg { grid-column: auto; height: clamp(320px, 64vw, 460px); }
-  .proj-featured { grid-template-columns: 1fr; }
-  .proj-pair { grid-template-columns: 1fr; gap: 48px; }
-  .proj-card--offset { margin-top: 0; }
-  .bento { grid-template-columns: repeat(2, 1fr); }
-  .bento__tile--lg { grid-column: span 2; }
-  .bento__quote { grid-column: span 2; min-height: 160px; }
+
+  /* Folder collapses: tabs become a horizontal strip above the preview. */
+  .folder { grid-template-columns: 1fr; gap: 24px; }
+  .folder__tabs {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-top: 0;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .folder-tab { flex: 0 0 auto; min-width: 230px; padding: 16px 18px; }
+  .folder-tab::before { display: none; }
+  .folder-tab[data-active] { transform: none; }
+  /* Undo the right column's mirror when it's a horizontal strip. */
+  .folder__tabs--right .folder-tab { text-align: left; align-items: flex-start; }
 }
 
 @media (max-width: 600px) {
-  .brandmark { letter-spacing: 0.3em; text-indent: 0.3em; }
   .contact-pill { display: none; }
-  .projects__grid { grid-template-columns: 1fr; }
-  .bento { grid-template-columns: 1fr; grid-auto-rows: 180px; }
-  .bento__tile--lg, .bento__tile--tall, .bento__quote { grid-column: span 1; grid-row: span 1; }
   .site-footer__inner { flex-direction: column; text-align: center; }
 }
 
@@ -1226,6 +1651,141 @@ article:hover .proj-media__video { transform: scale(1.05); }
 .arcade-screen-full .arcade__screen-footer {
   margin-top: clamp(8px, 1.8vh, 24px);
   font-size: clamp(10px, min(2vh, 3.2vw), 22px);
+}
+
+/* ---- Platformer hub (level select) + level host, on the full CRT ---- */
+.platformer-hub__sub {
+  margin: 0 0 clamp(10px, 2vh, 22px);
+  text-align: center;
+  font-family: var(--font-press-start), monospace;
+  font-size: clamp(7px, min(1.4vh, 2.4vw), 11px);
+  letter-spacing: 1px;
+  opacity: 0.65;
+}
+.platformer-hub__grid {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(8px, 1.6vh, 16px);
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: none;
+}
+.platformer-hub__grid::-webkit-scrollbar { display: none; }
+.platformer-hub__tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  padding: clamp(10px, 1.8vh, 18px) clamp(10px, 1.6vw, 16px);
+  border: 2px solid rgba(232, 232, 232, 0.3);
+  background: transparent;
+  color: var(--ac-ink);
+  font-family: var(--font-press-start), monospace;
+  text-align: left;
+  cursor: url(/assets/cursor-hand.png) 5 1, pointer;
+}
+.platformer-hub__tile[aria-selected="true"],
+.platformer-hub__tile:focus-visible {
+  border-color: var(--ac-ink);
+  background: rgba(232, 232, 232, 0.08);
+}
+.platformer-hub__tile:focus-visible { outline: none; }
+.platformer-hub__tile[aria-selected="true"]::after {
+  content: "▶";
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 8px;
+  animation: ac-blink 0.6s steps(1) infinite;
+}
+.platformer-hub__rank {
+  font-size: clamp(7px, min(1.3vh, 2vw), 10px);
+  opacity: 0.55;
+}
+.platformer-hub__title {
+  font-size: clamp(8px, min(1.7vh, 2.6vw), 13px);
+  line-height: 1.4;
+}
+.platformer-hub__star { font-size: clamp(8px, 1.6vh, 12px); }
+
+.platformer {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.6vh, 16px);
+  height: 100%;
+  min-height: 0;
+}
+.platformer__head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-family: var(--font-press-start), monospace;
+}
+.platformer__rank { font-size: clamp(8px, 1.5vh, 11px); opacity: 0.55; }
+.platformer__name { font-size: clamp(10px, min(2.2vh, 3.4vw), 18px); }
+.platformer__stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.platformer__canvas {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  background: #000;
+}
+.platformer__card {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 2.4vh, 24px);
+  padding: 20px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.78);
+  font-family: var(--font-press-start), monospace;
+}
+.platformer__mechanic {
+  margin: 0;
+  font-size: clamp(10px, min(2vh, 3vw), 16px);
+  line-height: 1.8;
+  max-width: 60ch;
+}
+.platformer__hint {
+  margin: 0;
+  font-size: clamp(7px, min(1.4vh, 2.2vw), 10px);
+  opacity: 0.65;
+  letter-spacing: 1px;
+}
+.platformer__action {
+  border: 0;
+  background: transparent;
+  color: var(--ac-ink);
+  font-family: var(--font-press-start), monospace;
+  font-size: clamp(8px, min(1.7vh, 2.6vw), 12px);
+  letter-spacing: 1px;
+  cursor: url(/assets/cursor-hand.png) 5 1, pointer;
+  padding: 6px 10px;
+}
+.platformer__action:hover { background: var(--ac-ink); color: #000; }
+.platformer__action:focus-visible { outline: 2px solid var(--ac-ink); outline-offset: 3px; }
+
+@media (max-width: 640px) {
+  .platformer-hub__grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* Stage hint line, fixed along the bottom on every stage */
@@ -1829,6 +2389,9 @@ article:hover .proj-media__video { transform: scale(1.05); }
   --cream-dim: rgba(243, 231, 203, 0.62);
   min-height: 100dvh;
   background: var(--stage);
+  /* Fade the whole hall (closed curtains included) in on load, like the other
+     hobby pages — so it eases in instead of just appearing. */
+  animation: hobbyPageIn 0.3s ease both;
 }
 .trophy-page {
   position: relative;
@@ -1995,6 +2558,8 @@ article:hover .proj-media__video { transform: scale(1.05); }
 }
 
 /* ---- A single trophy: statue on a plinth with a nameplate ---- */
+/* Each trophy is a <button> (clicking pulls it into the focus view), so the
+   default button chrome is stripped here. */
 .trophy {
   position: relative;
   display: flex;
@@ -2002,9 +2567,25 @@ article:hover .proj-media__video { transform: scale(1.05); }
   align-items: center;
   flex: none;
   width: clamp(118px, 14vw, 152px);
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
   opacity: 0;
   transform: translateY(26px);
   transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.2, 0.85, 0.25, 1);
+}
+/* A handful of titles (e.g. "Shai Gilgeous-Alexander") are too long for the
+   default plinth width and spill past the nameplate's edge; widen just those. */
+.trophy--wide {
+  width: clamp(150px, 18vw, 200px);
+}
+/* Slightly smaller engraving so the long name never breaks mid-word. */
+.trophy--wide .trophy__title {
+  font-size: clamp(12px, 1.3vw, 14.5px);
 }
 .trophy-page[data-open] .trophy {
   opacity: 1;
@@ -2035,6 +2616,19 @@ article:hover .proj-media__video { transform: scale(1.05); }
 }
 .trophy__statue svg { display: block; width: 100%; height: auto; }
 .trophy__statue[data-statue="star"] { width: clamp(64px, 8vw, 96px); }
+
+/* 3D statue slot (Blender .glb via StatueScene) — same footprint as the SVG
+   statues so 3D and SVG trophies sit side by side on a shelf. */
+.trophy__canvas {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: clamp(78px, 9.5vw, 116px);
+  aspect-ratio: 1 / 1.2;
+  filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 11px rgba(232, 189, 85, 0.28));
+}
+.trophy__canvas canvas { display: block; width: 100% !important; height: 100% !important; }
 
 /* Team logo shown as a gold medallion (so full-color crests still read on the
    dark stage and keep the trophy feel). */
@@ -2105,6 +2699,7 @@ article:hover .proj-media__video { transform: scale(1.05); }
   font-size: clamp(13px, 1.45vw, 16px);
   color: #2c1f0c;
   text-shadow: 0 1px 0 rgba(255, 244, 210, 0.5);
+  overflow-wrap: break-word;
 }
 .trophy__sub {
   font-size: clamp(9.5px, 1vw, 11px);
@@ -2133,6 +2728,177 @@ article:hover .proj-media__video { transform: scale(1.05); }
 }
 .trophy:hover .trophy__spot,
 .trophy:focus-within .trophy__spot { opacity: 1; }
+
+/* ---- Focus view: a statue pulled to centre stage ---- */
+.trophy-focus {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(28px, 5vw, 72px);
+  padding: clamp(16px, 4vw, 48px);
+  animation: trophyFocusIn 0.3s ease both;
+}
+@keyframes trophyFocusIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.trophy-focus__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(12, 6, 3, 0.82);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+.trophy-focus__stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  animation: trophyFocusRise 0.45s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+@keyframes trophyFocusRise {
+  from { opacity: 0; transform: translateY(22px) scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+.trophy-focus__statue {
+  position: relative;
+  width: min(44vw, 400px);
+  height: min(56vh, 460px);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: grab;
+  border-radius: 20px;
+}
+.trophy-focus__statue:active { cursor: grabbing; }
+/* Horizontal drags turn the statue — keep touches from scrolling instead. */
+.trophy-focus__statue .trophy__canvas { touch-action: none; }
+/* Its own spotlight, since the shelf's is left behind. */
+.trophy-focus__statue::before {
+  content: "";
+  position: absolute;
+  inset: -14%;
+  pointer-events: none;
+  background: radial-gradient(50% 46% at 50% 42%, rgba(255, 213, 120, 0.22), transparent 70%);
+}
+/* The statue canvas fills the stage (the shelf clamps it small). */
+.trophy-focus__statue .trophy__canvas {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+.trophy-focus__statue .trophy__medal,
+.trophy-focus__statue .trophy__statue {
+  width: min(36vw, 300px);
+  height: auto;
+}
+.trophy-focus__panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  width: min(88vw, 400px);
+  padding: clamp(18px, 2.6vw, 28px);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #2a2018 0%, #1c1610 100%);
+  border: 1px solid rgba(232, 189, 85, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 160, 0.16),
+    0 24px 48px rgba(0, 0, 0, 0.55);
+  animation: trophyFocusRise 0.45s cubic-bezier(0.2, 0.85, 0.25, 1) 0.06s both;
+}
+.trophy-focus__plate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #eccd78 0%, #cda142 52%, #ab8230 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 248, 218, 0.65), inset 0 -1px 2px rgba(90, 60, 14, 0.4);
+}
+.trophy-focus__plate .trophy__emblem { flex: none; width: 26px; }
+.trophy-focus__name {
+  font-family: var(--font-cormorant), serif;
+  font-weight: 600;
+  font-size: clamp(20px, 2.3vw, 26px);
+  line-height: 1.15;
+  color: #2c1f0c;
+  text-shadow: 0 1px 0 rgba(255, 244, 210, 0.5);
+}
+.trophy-focus__desc {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(246, 234, 210, 0.85);
+}
+.trophy-focus__close {
+  padding: 10px 20px;
+  border: 1px solid rgba(232, 189, 85, 0.5);
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-hi);
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+.trophy-focus__close:hover,
+.trophy-focus__close:focus-visible {
+  background: rgba(232, 189, 85, 0.12);
+  border-color: var(--gold);
+}
+/* Polish sparkles: gold four-point stars flung outward from the click point
+   (the burst's left/top are set inline to the tap position). */
+.trophy-focus__burst {
+  position: absolute;
+  pointer-events: none;
+}
+.trophy-focus__spark {
+  position: absolute;
+  width: var(--s);
+  height: var(--s);
+  background: linear-gradient(165deg, #fff6d8 0%, #f2d06b 55%, #c89636 100%);
+  clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+  filter: drop-shadow(0 0 6px rgba(255, 213, 120, 0.8));
+  transform: translate(-50%, -50%) scale(0);
+  animation: trophySpark 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) var(--d) forwards;
+}
+@keyframes trophySpark {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+  12% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1) rotate(var(--r));
+  }
+}
+/* Leaving: the overlay fades while stage and panel sink back down. */
+.trophy-focus[data-closing] { animation: trophyFocusOut 0.3s ease both; }
+.trophy-focus[data-closing] .trophy-focus__stage,
+.trophy-focus[data-closing] .trophy-focus__panel {
+  animation: trophyFocusSink 0.3s cubic-bezier(0.5, 0, 0.75, 0.5) both;
+}
+@keyframes trophyFocusOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes trophyFocusSink {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(20px) scale(0.94); }
+}
 
 /* ---- The curtains (in front, parting on click) ---- */
 .curtain {
@@ -2255,7 +3021,17 @@ article:hover .proj-media__video { transform: scale(1.05); }
   .trophy-page[data-open] .curtain__panel--left { transform: translateX(-90%); }
   .trophy-page[data-open] .curtain__panel--right { transform: translateX(90%); }
   .trophy { width: clamp(116px, 40vw, 150px); }
+  .trophy--wide { width: clamp(148px, 48vw, 186px); }
   .shelf__row { gap: 16px; }
+  /* Focus view stacks: statue above, panel below. */
+  .trophy-focus {
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 8px;
+    padding-top: 64px;
+    overflow-y: auto;
+  }
+  .trophy-focus__statue { width: min(78vw, 320px); height: min(42vh, 340px); }
 }
 
 /* ---- Reduced motion: no reveal, no pulse — show the hall outright ---- */
@@ -2266,4 +3042,17 @@ article:hover .proj-media__video { transform: scale(1.05); }
   .trophy,
   .hall__header { opacity: 1; transform: none; transition: none; }
   .trophy__statue { transition: none; }
+  .trophy-focus,
+  .trophy-focus__stage,
+  .trophy-focus__panel,
+  .trophy-focus[data-closing],
+  .trophy-focus[data-closing] .trophy-focus__stage,
+  .trophy-focus[data-closing] .trophy-focus__panel { animation: none; }
+  /* Sparkles still answer the click, but twinkle in place instead of flying. */
+  .trophy-focus__spark { animation: trophySparkStill 0.6s ease var(--d) forwards; }
+}
+@keyframes trophySparkStill {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
 }

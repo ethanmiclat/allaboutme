@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <!-- "The things I love" still life: one emblem per hobby — a vinyl record
+       (music), a gold trophy (sports), a film reel (films) and an arcade
+       joystick (games) — clustered on a table under a single warm spotlight.
+       Palette matches the intro panel (#1c2530 → #12181f → #0a0e12). -->
+  <defs>
+    <radialGradient id="room" cx="50%" cy="0%" r="120%">
+      <stop offset="0%" stop-color="#1c2530"/>
+      <stop offset="55%" stop-color="#12181f"/>
+      <stop offset="100%" stop-color="#0a0e12"/>
+    </radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f6ead2" stop-opacity="0.30"/>
+      <stop offset="75%" stop-color="#f6ead2" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#f6ead2" stop-opacity="0.03"/>
+    </linearGradient>
+    <linearGradient id="table" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#161d25"/>
+      <stop offset="100%" stop-color="#0a0e12"/>
+    </linearGradient>
+    <radialGradient id="pool" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f2dfb8" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#f2dfb8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0.12" y2="1">
+      <stop offset="0%" stop-color="#fcebb0"/>
+      <stop offset="40%" stop-color="#ecc362"/>
+      <stop offset="72%" stop-color="#c89636"/>
+      <stop offset="100%" stop-color="#9a6c22"/>
+    </linearGradient>
+    <radialGradient id="vignette" cx="50%" cy="46%" r="72%">
+      <stop offset="0%" stop-color="#06080b" stop-opacity="0"/>
+      <stop offset="70%" stop-color="#06080b" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#06080b" stop-opacity="0.8"/>
+    </radialGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <filter id="shadow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#room)"/>
+
+  <!-- One warm spotlight over the arrangement -->
+  <polygon points="690,-60 950,-60 1170,720 470,720" fill="url(#beam)" filter="url(#soft)"/>
+
+  <!-- Table -->
+  <rect y="700" width="1600" height="200" fill="url(#table)"/>
+  <ellipse cx="820" cy="706" rx="500" ry="58" fill="url(#pool)" filter="url(#soft)"/>
+
+  <!-- Cast shadows -->
+  <ellipse cx="600" cy="708" rx="200" ry="18" fill="#04070a" opacity="0.55" filter="url(#shadow)"/>
+  <ellipse cx="1030" cy="708" rx="165" ry="16" fill="#04070a" opacity="0.5" filter="url(#shadow)"/>
+  <ellipse cx="820" cy="712" rx="120" ry="14" fill="#04070a" opacity="0.6" filter="url(#shadow)"/>
+  <ellipse cx="1253" cy="716" rx="95" ry="11" fill="#04070a" opacity="0.5" filter="url(#shadow)"/>
+
+  <!-- Vinyl record (music), leaning at back-left -->
+  <g>
+    <circle cx="600" cy="515" r="190" fill="#10151b"/>
+    <circle cx="600" cy="515" r="176" fill="none" stroke="#232f3a" stroke-width="2" opacity="0.6"/>
+    <circle cx="600" cy="515" r="150" fill="none" stroke="#232f3a" stroke-width="2" opacity="0.5"/>
+    <circle cx="600" cy="515" r="124" fill="none" stroke="#232f3a" stroke-width="2" opacity="0.4"/>
+    <circle cx="600" cy="515" r="98" fill="none" stroke="#232f3a" stroke-width="2" opacity="0.3"/>
+    <circle cx="600" cy="515" r="62" fill="#a8432f"/>
+    <circle cx="600" cy="515" r="7" fill="#0a0e12"/>
+    <!-- warm rim light from the spotlight, upper right -->
+    <path d="M 692 349 A 190 190 0 0 1 782 460" fill="none" stroke="#f2dfb8" stroke-width="4" opacity="0.4" stroke-linecap="round"/>
+  </g>
+
+  <!-- Film reel (films), at back-right -->
+  <g>
+    <circle cx="1030" cy="555" r="150" fill="#151c24" stroke="#2c3947" stroke-width="10"/>
+    <circle cx="1030" cy="475" r="40" fill="#0a0e12"/>
+    <circle cx="1106" cy="530" r="40" fill="#0a0e12"/>
+    <circle cx="1077" cy="620" r="40" fill="#0a0e12"/>
+    <circle cx="983" cy="620" r="40" fill="#0a0e12"/>
+    <circle cx="954" cy="530" r="40" fill="#0a0e12"/>
+    <circle cx="1030" cy="555" r="26" fill="#232f3a"/>
+    <circle cx="1030" cy="555" r="8" fill="#0a0e12"/>
+    <path d="M 942 435 A 150 150 0 0 1 1055 408" fill="none" stroke="#f2dfb8" stroke-width="4" opacity="0.35" stroke-linecap="round"/>
+  </g>
+
+  <!-- Gold trophy (sports), front and centre — echoes the Hall of Fame -->
+  <g>
+    <path d="M 758 468 C 762 545 782 585 820 596 C 858 585 878 545 882 468 Z" fill="url(#gold)"/>
+    <path d="M 758 480 C 718 486 720 538 764 546" fill="none" stroke="url(#gold)" stroke-width="9"/>
+    <path d="M 882 480 C 922 486 920 538 876 546" fill="none" stroke="url(#gold)" stroke-width="9"/>
+    <rect x="808" y="596" width="24" height="40" fill="url(#gold)"/>
+    <rect x="794" y="634" width="52" height="12" rx="3" fill="url(#gold)"/>
+    <rect x="780" y="646" width="80" height="30" rx="4" fill="#241a10"/>
+    <rect x="768" y="676" width="104" height="22" rx="4" fill="#191009"/>
+    <rect x="788" y="654" width="64" height="14" rx="2" fill="url(#gold)" opacity="0.85"/>
+  </g>
+
+  <!-- Arcade joystick (games), small, front-right -->
+  <g transform="translate(58 6)">
+    <path d="M 1180 578 C 1176 610 1178 636 1184 656" fill="none" stroke="#2c3947" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="1179" cy="562" r="26" fill="#c0392b"/>
+    <circle cx="1171" cy="553" r="8" fill="#f2dfb8" opacity="0.45"/>
+    <rect x="1128" y="654" width="130" height="48" rx="10" fill="#1c242e"/>
+    <circle cx="1236" cy="672" r="9" fill="#a8432f"/>
+    <circle cx="1214" cy="686" r="9" fill="#3d6b52"/>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#vignette)"/>
+</svg>

@@ -1,14 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { GAMES } from "@/lib/games";
-
 /**
  * Presentational pieces for "Ethan's Arcade" (/hobbies/games), rendered by
  * <ArcadeExperience>:
  *   - <WelcomeScreen> : the attract screen overlaid on the room photo's cabinet.
- *   - <GamesScreen>   : the CRT contents (HUD + favorite-games table) shown after
- *                       the dive into the machine.
+ * (The CRT contents after the dive are the platformer hub — see
+ * platformer-hub.tsx.)
  * Motion is CSS (disabled under prefers-reduced-motion via globals.css).
  */
 
@@ -68,80 +65,3 @@ export function WelcomeScreen() {
     </>
   );
 }
-
-/**
- * The retro CRT contents: HUD, title, the favorite-games high-score table,
- * footer. Used on the full-page screen stage.
- *
- * When `selectedIndex` is supplied (driven by the arrow keys in
- * <ArcadeExperience>), that row is highlighted and kept scrolled into view, and
- * hovering/clicking a row reports it back via `onSelect`.
- */
-export function GamesScreen({
-  selectedIndex,
-  onSelect,
-}: {
-  selectedIndex?: number;
-  onSelect?: (index: number) => void;
-} = {}) {
-  const listRef = useRef<HTMLOListElement>(null);
-
-  // Keep the keyboard-selected row visible as you scroll the list.
-  useEffect(() => {
-    if (selectedIndex == null) return;
-    const row = listRef.current?.children[selectedIndex] as HTMLElement | undefined;
-    row?.scrollIntoView({ block: "nearest" });
-  }, [selectedIndex]);
-
-  return (
-    <>
-      <div className="arcade__scanlines" aria-hidden="true" />
-
-      <div className="arcade__hud">
-        <span>
-          <b>1UP</b>
-          <br />
-          012300
-        </span>
-        <span className="arcade__hud-mid">
-          <b>HI-SCORE</b>
-          <br />
-          045000
-        </span>
-        <span>
-          <b>2UP</b>
-          <br />
-          000000
-        </span>
-      </div>
-
-      <p className="arcade__screen-title">&#9733; FAVORITE GAMES &#9733;</p>
-
-      <ol className="arcade__list" ref={listRef}>
-        {GAMES.map((g, i) => (
-          <li key={g.rank}>
-            <a
-              className="arcade__row"
-              href={g.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-selected={selectedIndex === i || undefined}
-              onMouseEnter={onSelect ? () => onSelect(i) : undefined}
-            >
-              <span className="arcade__rank">{g.rank}</span>
-              <span className="arcade__title">{g.title}</span>
-              <span className="arcade__dots" aria-hidden="true" />
-              <span className="arcade__score">{g.score}</span>
-            </a>
-          </li>
-        ))}
-      </ol>
-
-      <div className="arcade__screen-footer">
-        <span className="arcade__blink">INSERT COIN</span>
-        <span>CREDIT 67</span>
-      </div>
-    </>
-  );
-}
-

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import AlbumImpactCarousel from "@/components/ui/album-impact-carousel";
+import MusicBackground from "@/components/ui/music-background";
 import ScrollToTop from "@/components/scroll-to-top";
 
 export const metadata: Metadata = { title: "Music — Ethan Miclat" };
@@ -16,8 +17,10 @@ export const metadata: Metadata = { title: "Music — Ethan Miclat" };
 export default function MusicPage() {
   return (
     <main className="music-page">
+      <div className="music-page__bg" aria-hidden="true" />
+      <MusicBackground />
       <ScrollToTop />
-      <Link className="music-page__back" href="/#hobbies" scroll={false}>
+      <Link className="music-page__back" href="/#hobby-music" scroll={false}>
         <ArrowLeft aria-hidden="true" />
         Back
       </Link>

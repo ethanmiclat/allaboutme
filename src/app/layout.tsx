@@ -36,10 +36,27 @@ const bebas = Bebas_Neue({
   display: "swap",
 });
 
+const DESCRIPTION =
+  "Ethan Miclat — a family-driven student at the University of Arkansas's Walton Honors College of Business who dreams big and always looks to be a positive, genuine, and good person.";
+
 export const metadata: Metadata = {
+  // TODO: once deployed, set this to the real domain so social-card image URLs
+  // resolve absolutely, e.g. metadataBase: new URL("https://ethanmiclat.com"),
   title: "Ethan Miclat",
-  description:
-    "Ethan Miclat — a family-driven student at the University of Arkansas's Walton Honors College of Business who dreams big and always looks to be a positive, genuine, and good person.",
+  description: DESCRIPTION,
+  openGraph: {
+    title: "Ethan Miclat",
+    description: DESCRIPTION,
+    siteName: "Ethan Miclat",
+    type: "website",
+    images: [{ url: "/assets/hero-bg.jpeg", width: 2016, height: 1512 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ethan Miclat",
+    description: DESCRIPTION,
+    images: ["/assets/hero-bg.jpeg"],
+  },
 };
 
 export default function RootLayout({
@@ -48,8 +65,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`js dark ${inter.variable} ${cormorant.variable} ${pressStart.variable} ${bebas.variable}`}
+      data-theme="dark"
+      suppressHydrationWarning
+      className={`js ${inter.variable} ${cormorant.variable} ${pressStart.variable} ${bebas.variable}`}
     >
+      <head>
+        {/* Apply the saved theme before first paint so there's no flash. Runs
+            synchronously during HTML parsing (see Next's "Preventing Flash
+            before hydration" guide). Defaults to the server-rendered dark. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body>
         <SmoothScroll />
         <ScrollReveal />

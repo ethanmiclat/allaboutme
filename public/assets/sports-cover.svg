@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <!-- Moody spot-lit arena, previewing the Hall of Fame it opens into: warm
+       gold light cones and court markings, crimson velvet curtains framing the
+       edges. Greens from the panel's original palette; velvet (#5c0e16) and
+       gold (#e8bd55) pulled from the trophy room's theme. -->
+  <defs>
+    <radialGradient id="house" cx="50%" cy="0%" r="120%">
+      <stop offset="0%" stop-color="#274b3b"/>
+      <stop offset="55%" stop-color="#16261f"/>
+      <stop offset="100%" stop-color="#0c1611"/>
+    </radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fcebb0" stop-opacity="0.55"/>
+      <stop offset="70%" stop-color="#f2d68a" stop-opacity="0.17"/>
+      <stop offset="100%" stop-color="#f2d68a" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1f3527"/>
+      <stop offset="100%" stop-color="#0e1a12"/>
+    </linearGradient>
+    <radialGradient id="pool" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f2d68a" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="#f2d68a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="velvetL" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8a1826"/>
+      <stop offset="60%" stop-color="#5c0e16"/>
+      <stop offset="100%" stop-color="#390710"/>
+    </linearGradient>
+    <linearGradient id="velvetR" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0%" stop-color="#8a1826"/>
+      <stop offset="60%" stop-color="#5c0e16"/>
+      <stop offset="100%" stop-color="#390710"/>
+    </linearGradient>
+    <radialGradient id="vignette" cx="50%" cy="46%" r="72%">
+      <stop offset="0%" stop-color="#04100a" stop-opacity="0"/>
+      <stop offset="72%" stop-color="#04100a" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#04100a" stop-opacity="0.72"/>
+    </radialGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <filter id="softer" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="40"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#house)"/>
+
+  <!-- Warm overhead haze -->
+  <ellipse cx="800" cy="120" rx="620" ry="200" fill="#f2d68a" opacity="0.10" filter="url(#softer)"/>
+
+  <!-- Gold light cones (slightly leaned, never perfectly vertical) -->
+  <polygon points="415,-60 545,-60 755,650 455,650" fill="url(#beam)" opacity="0.55" filter="url(#soft)"/>
+  <polygon points="705,-80 905,-80 1025,665 585,665" fill="url(#beam)" opacity="0.72" filter="url(#soft)"/>
+  <polygon points="1055,-60 1185,-60 1145,650 855,650" fill="url(#beam)" opacity="0.5" filter="url(#soft)"/>
+
+  <!-- Court floor -->
+  <polygon points="0,620 1600,620 1600,900 0,900" fill="url(#floor)"/>
+  <!-- Sideline edges converging toward the horizon -->
+  <line x1="245" y1="900" x2="555" y2="622" stroke="#c9a44a" stroke-width="3" opacity="0.4"/>
+  <line x1="1355" y1="900" x2="1045" y2="622" stroke="#c9a44a" stroke-width="3" opacity="0.4"/>
+  <!-- Half-court line and centre circle, in perspective -->
+  <line x1="70" y1="788" x2="1530" y2="742" stroke="#e8bd55" stroke-width="3.5" opacity="0.45"/>
+  <ellipse cx="800" cy="764" rx="172" ry="46" fill="none" stroke="#e8bd55" stroke-width="4" opacity="0.5" transform="rotate(-1.4 800 764)"/>
+
+  <!-- Gold light pools where the beams land -->
+  <ellipse cx="612" cy="672" rx="230" ry="52" fill="url(#pool)" filter="url(#soft)"/>
+  <ellipse cx="810" cy="700" rx="300" ry="66" fill="url(#pool)" filter="url(#soft)"/>
+  <ellipse cx="1004" cy="672" rx="220" ry="50" fill="url(#pool)" filter="url(#soft)"/>
+
+  <!-- Crimson velvet curtains framing the scene, hinting at the reveal -->
+  <g>
+    <path d="M 0 0 L 200 0 C 156 150 168 300 148 460 C 132 610 152 760 184 900 L 0 900 Z" fill="url(#velvetL)"/>
+    <path d="M 128 0 C 104 190 116 420 96 640 C 88 740 96 830 108 900" fill="none" stroke="#2b0510" stroke-width="14" opacity="0.55"/>
+    <path d="M 66 0 C 50 200 60 460 46 700 C 42 780 46 850 52 900" fill="none" stroke="#a52a38" stroke-width="8" opacity="0.35"/>
+  </g>
+  <g>
+    <path d="M 1600 0 L 1400 0 C 1444 150 1432 300 1452 460 C 1468 610 1448 760 1416 900 L 1600 900 Z" fill="url(#velvetR)"/>
+    <path d="M 1472 0 C 1496 190 1484 420 1504 640 C 1512 740 1504 830 1492 900" fill="none" stroke="#2b0510" stroke-width="14" opacity="0.55"/>
+    <path d="M 1534 0 C 1550 200 1540 460 1554 700 C 1558 780 1554 850 1548 900" fill="none" stroke="#a52a38" stroke-width="8" opacity="0.35"/>
+  </g>
+  <!-- Gold trim on each curtain's inner edge, catching the light -->
+  <path d="M 200 0 C 156 150 168 300 148 460 C 132 610 152 760 184 900" fill="none" stroke="#e8bd55" stroke-width="5" opacity="0.5"/>
+  <path d="M 1400 0 C 1444 150 1432 300 1452 460 C 1468 610 1448 760 1416 900" fill="none" stroke="#e8bd55" stroke-width="5" opacity="0.5"/>
+
+  <rect width="1600" height="900" fill="url(#vignette)"/>
+</svg>

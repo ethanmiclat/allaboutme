@@ -71,14 +71,13 @@ src/
 │       └── trophy-room-experience.tsx  # CLIENT: velvet-curtain reveal → lit shelves of gold trophy statues
 ├── lib/
 │   ├── utils.ts                # cn()
-│   ├── hero-title.ts           # hero "All About Me" — real Dancing Script glyph OUTLINES (opentype.js) for the clip-frontier write-on
 │   ├── albums.ts               # album data (id / title / artist / cover / nudgeDown)
 │   ├── games.ts                # arcade games list (rank / title / score) — Ethan's 15 favorites
 │   ├── catalogue.json          # ETHANFLIX titles by row (Movies/Shows/Anime/Books) — source of truth
 │   ├── posters.json            # generated kind:title → poster URL map (`npm run posters`)
 │   ├── films.ts                # builds ETHANFLIX `ROWS` from catalogue.json + posters.json
 │   └── sports.ts               # Hall of Fame data — `SHELVES` of trophies (title / sub / statue / emblem)
-public/assets/                  # hero-bg, IMG_3456 (portrait), rebel-hauling.* (poster/mp4/mov),
+public/assets/                  # hero-bg, IMG_3456 (portrait), rebel-hauling.* (poster/mp4),
 │                               #   music-cover.jpeg (Music card cover), albums/*.jpg,
 │                               #   arcade-scene.png (the arcade room),
 │                               #   cursor-arrow.png / cursor-hand.png (pixel cursors),
@@ -95,44 +94,13 @@ animations — the CSS was ported into `globals.css`):
 
 | Section   | Notes |
 |-----------|-------|
-| Hero      | sticky, fades on scroll; full-screen overlay menu; **"All About Me" title writes itself on** (see *Hero title write-on* below) |
+| Hero      | sticky, fades on scroll; full-screen overlay menu; **"All About Me"** title (Cormorant italic) sits in the lower-left so it clears Ethan on the right |
 | About     | portrait + Philosophy card + Journey timeline |
 | Hobbies   | 4 cards; each is a **link to its own route** (not in scroll flow or menu). The **Music** card uses `public/assets/music-cover.jpeg` (a concert photo) as its background via `.hobby-card__media--music` |
 | Projects  | Rebel Hauling featured video → rebelhauling.com; placeholder cards; GitHub/Résumé pills |
 | Contact   | socials + mailto form |
 | Location  | Fayetteville + live Central-time clock |
 | Footer    | brand / nav / © |
-
-### Hero title write-on
-
-The hero title **"All About Me"** writes itself on in a Dancing Script cursive. It's built in
-`src/components/hero.tsx` from `src/lib/hero-title.ts`:
-
-- The letters are the **real Dancing Script glyph outlines** — true filled font contours
-  extracted with opentype.js (from `DancingScript.ttf`), one entry per visible glyph
-  (`HERO_TITLE_GLYPHS = {char, d, x0, x1}`). Because they're genuine closed font contours, every
-  anchor is geometrically correct — there is no hand-drawn centerline skeleton to gap at
-  junctions.
-- The write-on is **one clip frontier** (`penX`) swept left→right across the solid filled
-  glyphs. A single rAF loop computes one progress value `p` (0→1 over `START_DELAY` + then
-  `DRAW_DURATION`); `penX` is derived from it and drives **both** the fill `clipPath` frontier
-  (a forward-slanted parallelogram) **and** each glyph's outline `stroke-dashoffset` ink edge
-  (`.hero__sign-ink`, dasharray = each path's own `getTotalLength()`). One driver → the ink edge
-  and the filled body can never desync.
-- Runs in a `useLayoutEffect` (before paint, so nothing flashes). `prefers-reduced-motion` and
-  no-JS both show the finished wordmark.
-
-> ⚠️ **Why outlines + a clip frontier (don't go back to a centerline pen mask).** Earlier
-> versions revealed the fill through a **mask built from a hand-drawn centerline skeleton**
-> (thin nib + trailing flood, `stroke-dashoffset`). That skeleton's subpaths didn't meet exactly
-> at letter junctions, so the reveal repeatedly produced **detached fragments / gaps / notches**
-> at loop→stem and bowl→stem (worst on `b`/`o`/`e`); tuning widths/lag never fixed it because
-> it's structural. Revealing a **solid** real glyph with a **monotonic** frontier cannot
-> fragment or notch — the failure mode is gone by construction. Regenerate the outline data with
-> the scratchpad tooling if the text or font changes.
-
-- After editing the `.hero__sign*` rules in `globals.css`, **clear `.next`** and restart or
-  Turbopack serves stale CSS (see Notes).
 
 ### Hobby routes (the "can't be scrolled to" sections)
 
@@ -338,8 +306,11 @@ are marked with `[brackets]` and `data-placeholder`.
   pulled in — but **verify the result**, the search occasionally returns the wrong release
   (e.g. it once grabbed Frank Ocean's *Moon River* art for *Channel Orange*). Covers that
   aren't on the catalog (e.g. *Love Is Only a Feeling*) were dropped in manually.
-- Large source images are downscaled/compressed before use (e.g. the Music card cover went
-  from ~13.6 MB to ~1.3 MB via `sips --resampleWidth 2200 -s formatOptions 80`).
+- Large source images are downscaled/compressed before use. The current pipeline (much better
+  than `sips`) is ffmpeg → mozjpeg: `ffmpeg -i in.jpg -vf "scale=900:-2" -f image2pipe -vcodec
+  ppm - | cjpeg -quality 80 -optimize > out.jpg`. Album covers are 900px/q80 (~100–300 KB each);
+  the portrait & Music card cover are 1600px. The unused `rebel-hauling.mov` source (32 MB) was
+  removed from `public/` (recoverable from git history).
 - Restart the dev server after editing `globals.css` if a style change doesn't show — the
   Turbopack dev server can serve stale CSS (kill anything on port 3000, `rm -rf .next`,
   `npm run dev`).

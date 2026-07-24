@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <!-- Projection-booth scene: a warm beam cutting through dust from the left,
+       a 35mm strip running along the bottom, heavy vignette. Palette matches
+       the Films hobby panel (#4a1114 → #250a0c → #0b0506). -->
+  <defs>
+    <radialGradient id="room" cx="50%" cy="0%" r="120%">
+      <stop offset="0%" stop-color="#4a1114"/>
+      <stop offset="55%" stop-color="#250a0c"/>
+      <stop offset="100%" stop-color="#0b0506"/>
+    </radialGradient>
+    <linearGradient id="throw" x1="150" y1="0" x2="1600" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffd9a8" stop-opacity="0.5"/>
+      <stop offset="45%" stop-color="#ffc894" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#ffc894" stop-opacity="0.04"/>
+    </linearGradient>
+    <radialGradient id="lens" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffe8c4" stop-opacity="0.95"/>
+      <stop offset="35%" stop-color="#ffca8e" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#ffca8e" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="stripglow" x1="0" y1="0" x2="1600" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff9e6a" stop-opacity="0.22"/>
+      <stop offset="55%" stop-color="#ff9e6a" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#ff9e6a" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="vignette" cx="46%" cy="42%" r="74%">
+      <stop offset="0%" stop-color="#080304" stop-opacity="0"/>
+      <stop offset="70%" stop-color="#080304" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#080304" stop-opacity="0.82"/>
+    </radialGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+    <filter id="glowblur" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="26"/>
+    </filter>
+    <!-- One repeating film-strip cell: perf holes top & bottom, frame window between -->
+    <pattern id="film" width="66" height="150" patternUnits="userSpaceOnUse">
+      <rect width="66" height="150" fill="#160608"/>
+      <rect x="19" y="10" width="28" height="18" rx="5" fill="#080304"/>
+      <rect x="19" y="122" width="28" height="18" rx="5" fill="#080304"/>
+      <rect x="7" y="40" width="52" height="70" rx="3" fill="#2b0d10"/>
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#room)"/>
+
+  <!-- The beam, widening from the projector toward the screen -->
+  <polygon points="150,318 150,352 1650,580 1650,120" fill="url(#throw)" filter="url(#soft)"/>
+  <!-- Brighter core inside the beam -->
+  <polygon points="150,326 150,344 1650,430 1650,260" fill="url(#throw)" opacity="0.7" filter="url(#soft)"/>
+
+  <!-- Lens glow at the source -->
+  <circle cx="150" cy="334" r="120" fill="url(#lens)" filter="url(#glowblur)"/>
+  <circle cx="150" cy="334" r="26" fill="#ffe8c4" opacity="0.9" filter="url(#soft)"/>
+
+  <!-- Dust motes drifting in the light -->
+  <g fill="#ffe4bd">
+    <circle cx="320" cy="330" r="2.4" opacity="0.35"/>
+    <circle cx="430" cy="298" r="1.6" opacity="0.28"/>
+    <circle cx="505" cy="365" r="2.8" opacity="0.3"/>
+    <circle cx="610" cy="320" r="1.4" opacity="0.22"/>
+    <circle cx="700" cy="392" r="2.2" opacity="0.26"/>
+    <circle cx="790" cy="286" r="1.8" opacity="0.2"/>
+    <circle cx="880" cy="350" r="2.6" opacity="0.24"/>
+    <circle cx="985" cy="420" r="1.5" opacity="0.18"/>
+    <circle cx="1080" cy="310" r="2.1" opacity="0.2"/>
+    <circle cx="1175" cy="380" r="1.7" opacity="0.16"/>
+    <circle cx="1290" cy="330" r="2.4" opacity="0.16"/>
+    <circle cx="1390" cy="430" r="1.6" opacity="0.13"/>
+    <circle cx="560" cy="430" r="1.8" opacity="0.2"/>
+  </g>
+
+  <!-- 35mm strip running along the bottom, tilted, catching the beam's warmth -->
+  <g transform="rotate(-3.2 800 790)">
+    <rect x="-120" y="715" width="1880" height="150" fill="url(#film)"/>
+    <rect x="-120" y="715" width="1880" height="150" fill="url(#stripglow)"/>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#vignette)"/>
+</svg>

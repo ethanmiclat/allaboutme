@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { ROWS, type FlixItem } from "@/lib/films";
@@ -22,6 +22,13 @@ import { ROWS, type FlixItem } from "@/lib/films";
 export default function EthanflixExperience() {
   // The intro plays once, then we settle into the catalogue.
   const [intro, setIntro] = useState(true);
+
+  // Arriving from the homepage's hobby stack (scrolled near the bottom), the
+  // old scroll position can survive the route change — land at the top before
+  // first paint so the intro plays over the top of the catalogue.
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     // Honor reduced-motion: skip straight to the catalogue (0ms), else play the
@@ -77,7 +84,7 @@ function Catalogue() {
     <main className="flix-catalogue">
       <header className="flix-topbar">
         <span className="flix-wordmark">ETHANFLIX</span>
-        <Link className="flix-back" href="/#hobbies" scroll={false}>
+        <Link className="flix-back" href="/#hobby-films" scroll={false}>
           <ArrowLeft aria-hidden="true" />
           Back
         </Link>

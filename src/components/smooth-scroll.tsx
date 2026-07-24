@@ -36,6 +36,9 @@ export default function SmoothScroll() {
     });
 
     const onClick = (e: MouseEvent) => {
+      // Leave modified/already-handled clicks to the browser (new tab, etc.).
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
+        return;
       const anchor = (e.target as HTMLElement | null)?.closest?.(
         'a[href^="#"]'
       ) as HTMLAnchorElement | null;
@@ -45,7 +48,10 @@ export default function SmoothScroll() {
         const target = document.querySelector(id);
         if (target) {
           e.preventDefault();
-          lenis.scrollTo(target as HTMLElement);
+          // Tag it as a nav jump so section gates (e.g. the hobbies snap) let it
+          // pass through instead of grabbing it mid-scroll. Lenis clears userData
+          // when the scroll completes or the user interrupts.
+          lenis.scrollTo(target as HTMLElement, { userData: { nav: true } });
         }
       }
     };

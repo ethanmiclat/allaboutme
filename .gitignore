@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local-only originals: raw source photos/videos before compression into
+# public/assets (kept on disk for re-exports, not part of the deployed site —
+# too large for git history)
+/legacy/
