@@ -45,17 +45,24 @@ export default function ScrollToHash() {
     // Land immediately (pre-paint, so there's no flash of the top).
     window.scrollTo({ top, behavior: "instant" as ScrollBehavior });
 
-    // Then hold the position for a few frames. Coming back from a hobby page,
+    // Then hold the position for a short window. Coming back from a hobby page,
     // the previous route's Lenis instance is torn down and a fresh one is
     // created on this page; in the gap a stale RAF can yank the scroll back to
     // ~0 (the hero), or the new Lenis can initialize from a clobbered position.
-    // Re-asserting for a handful of frames — and pushing the new Lenis to the
-    // target once it exists — defeats both races. We stop the moment the user
-    // actually scrolls, so this never fights a real interaction.
+    // Re-asserting — and pushing the new Lenis to the target once it exists —
+    // defeats both races. We stop the moment the user actually scrolls, so this
+    // never fights a real interaction.
+    //
+    // The window is measured in WALL-CLOCK time, not a frame count: a fixed
+    // number of frames lasts only ~66ms on a 120Hz ProMotion display (vs ~266ms
+    // at 60Hz) — too short for the incoming Lenis to settle, which let the race
+    // slip through and land on the hero on high-refresh screens. A fixed 500ms
+    // holds long enough on any refresh rate.
     type LenisLike = {
       scrollTo: (t: number, o?: { immediate?: boolean; force?: boolean }) => void;
     };
-    let frame = 0;
+    const HOLD_MS = 500;
+    const startedAt = performance.now();
     let raf = 0;
     let done = false;
     const stop = () => {
@@ -74,7 +81,7 @@ export default function ScrollToHash() {
       } else if (Math.abs(window.scrollY - top) > 2) {
         window.scrollTo({ top, behavior: "instant" as ScrollBehavior });
       }
-      if (++frame < 8) raf = requestAnimationFrame(hold);
+      if (performance.now() - startedAt < HOLD_MS) raf = requestAnimationFrame(hold);
       else stop();
     };
     raf = requestAnimationFrame(hold);
