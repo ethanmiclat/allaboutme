@@ -40,6 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Google fonts pulled down by scripts/gen-social-assets.py — re-fetched on
+# demand, and their generated output (the icons + OG card) is committed instead.
+/scripts/.fonts/
+
 # local-only originals: raw source photos/videos before compression into
 # public/assets (kept on disk for re-exports, not part of the deployed site —
 # too large for git history)
