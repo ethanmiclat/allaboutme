@@ -75,8 +75,12 @@ def google_font(family: str, weight: int = 400) -> Path:
 MONOGRAM = "EM"
 # Fraction of the tile the monogram's ink spans, and how far its optical center
 # sits below the tile's — script capitals hang lower than their bounding box
-# suggests, so nudging up reads as centered.
-GLYPH_WIDTH = 0.80
+# suggests, so nudging up reads as centered. icon.svg / favicon.ico run right
+# to the frame edge since they're transparent (nothing to clip against); the
+# apple-icon tile keeps a bit more margin since iOS applies its own rounded
+# mask on top and could crop letters that sit too close to the edge.
+GLYPH_WIDTH = 0.94
+APPLE_GLYPH_WIDTH = 0.84
 GLYPH_NUDGE_Y = -0.015
 # Outward thickening of every stroke, as a fraction of the tile. Great Vibes'
 # hairlines are thinner than one device pixel at tab size and drop out to
@@ -138,7 +142,7 @@ def write_icon_svg(font_path: Path, size: int = 512) -> None:
 
 
 def render_monogram(
-    font_path: Path, size: int, ink, bg=None, radius_frac: float = 0
+    font_path: Path, size: int, ink, bg=None, radius_frac: float = 0, width=GLYPH_WIDTH
 ) -> Image.Image:
     """Raster tile, drawn 8x and downsampled so the hairlines survive.
 
@@ -162,7 +166,7 @@ def render_monogram(
     # Match the SVG's framing: scale by ink width, center on the ink's bbox.
     probe = ImageFont.truetype(str(font_path), 100)
     px0, py0, px1, py1 = probe.getbbox(MONOGRAM)
-    font_size = round(100 * (GLYPH_WIDTH * box) / (px1 - px0))
+    font_size = round(100 * (width * box) / (px1 - px0))
     font = ImageFont.truetype(str(font_path), font_size)
     gx0, gy0, gx1, gy1 = font.getbbox(MONOGRAM)
     draw = ImageDraw.Draw(tile)
@@ -183,9 +187,9 @@ def render_monogram(
 def write_raster_icons(font_path: Path) -> None:
     # iOS applies its own rounding + it dislikes transparency, so ship it square
     # and opaque — same tile look the icon used to have everywhere.
-    render_monogram(font_path, 180, ink=CREAM, bg=SLATE).convert("RGB").save(
-        APP / "apple-icon.png"
-    )
+    render_monogram(
+        font_path, 180, ink=CREAM, bg=SLATE, width=APPLE_GLYPH_WIDTH
+    ).convert("RGB").save(APP / "apple-icon.png")
     print("wrote src/app/apple-icon.png")
 
     # Transparent + dark ink so it holds up on the light tab bar most browsers
