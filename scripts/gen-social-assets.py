@@ -2,16 +2,15 @@
 # site: the browser-tab / home-screen icon and the card that unfurls when the URL
 # is pasted into iMessage, Slack, Discord, X, LinkedIn…
 #
-#   src/app/icon.svg              cursive "EM" monogram, vector, transparent bg
+#   src/app/icon.svg              cursive "EM" monogram, vector (modern browsers)
 #   src/app/favicon.ico           the same monogram at 16/32/48 (legacy browsers)
 #   src/app/apple-icon.png        180x180, full-bleed (iOS rounds it itself)
 #   src/app/opengraph-image.jpg   1200x630 social card — the hero, re-framed
 #
-# icon.svg / favicon.ico are transparent so they sit on whatever chrome color
-# the browser gives them, and use dark ink rather than the site's cream accent
-# — cream nearly disappears against the light tab bar most browsers still
-# default to. apple-icon.png keeps its solid tile: iOS still fills transparent
-# pixels in with black on plenty of devices, so it isn't worth the risk there.
+# All four sit on the site's cream-on-slate tile. A transparent version was
+# tried for icon.svg/favicon.ico, but cream reads as nearly invisible on the
+# light tab bar most browsers still default to — the tile is what keeps it
+# legible regardless of the browser's theme.
 #
 # Next picks all four up by filename (see the app-icons / opengraph-image file
 # conventions) — nothing imports them.
@@ -75,12 +74,9 @@ def google_font(family: str, weight: int = 400) -> Path:
 MONOGRAM = "EM"
 # Fraction of the tile the monogram's ink spans, and how far its optical center
 # sits below the tile's — script capitals hang lower than their bounding box
-# suggests, so nudging up reads as centered. icon.svg / favicon.ico run right
-# to the frame edge since they're transparent (nothing to clip against); the
-# apple-icon tile keeps a bit more margin since iOS applies its own rounded
-# mask on top and could crop letters that sit too close to the edge.
-GLYPH_WIDTH = 0.94
-APPLE_GLYPH_WIDTH = 0.84
+# suggests, so nudging up reads as centered. Kept short of edge-to-edge so the
+# ink doesn't crowd (or, on apple-icon, get clipped by) the rounded corners.
+GLYPH_WIDTH = 0.84
 GLYPH_NUDGE_Y = -0.015
 # Outward thickening of every stroke, as a fraction of the tile. Great Vibes'
 # hairlines are thinner than one device pixel at tab size and drop out to
@@ -120,7 +116,7 @@ def monogram_outline(font_path: Path):
 
 
 def write_icon_svg(font_path: Path, size: int = 512) -> None:
-    """The vector icon: bold dark-ink monogram, transparent background."""
+    """The vector icon: cream monogram on a rounded slate tile."""
     path, (x0, y0, x1, y1), _upm = monogram_outline(font_path)
     scale = (GLYPH_WIDTH * size) / (x1 - x0)
     # Flip Y, then land the ink's center on the tile's (nudged) center.
@@ -131,8 +127,9 @@ def write_icon_svg(font_path: Path, size: int = 512) -> None:
     # divide by the group's scale because it's applied in font units.
     stroke = 2 * GLYPH_WEIGHT * size / scale
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {size} {size}" width="{size}" height="{size}">
+  <rect width="{size}" height="{size}" rx="{round(size * 0.22)}" fill="rgb{SLATE}"/>
   <g transform="translate({tx:.2f} {ty:.2f}) scale({scale:.5f} {-scale:.5f})">
-    <path fill="rgb{SLATE}" stroke="rgb{SLATE}" stroke-width="{stroke:.1f}"
+    <path fill="rgb{CREAM}" stroke="rgb{CREAM}" stroke-width="{stroke:.1f}"
           stroke-linejoin="round" stroke-linecap="round" d="{path}"/>
   </g>
 </svg>
@@ -185,17 +182,14 @@ def render_monogram(
 
 
 def write_raster_icons(font_path: Path) -> None:
-    # iOS applies its own rounding + it dislikes transparency, so ship it square
-    # and opaque — same tile look the icon used to have everywhere.
-    render_monogram(
-        font_path, 180, ink=CREAM, bg=SLATE, width=APPLE_GLYPH_WIDTH
-    ).convert("RGB").save(APP / "apple-icon.png")
+    # iOS applies its own rounding + it dislikes transparency, so ship it square.
+    render_monogram(font_path, 180, ink=CREAM, bg=SLATE).convert("RGB").save(
+        APP / "apple-icon.png"
+    )
     print("wrote src/app/apple-icon.png")
 
-    # Transparent + dark ink so it holds up on the light tab bar most browsers
-    # still default to (cream would all but vanish there).
     sizes = [16, 32, 48]
-    largest = render_monogram(font_path, sizes[-1], ink=SLATE)
+    largest = render_monogram(font_path, sizes[-1], ink=CREAM, bg=SLATE, radius_frac=0.22)
     largest.save(APP / "favicon.ico", sizes=[(s, s) for s in sizes])
     print("wrote src/app/favicon.ico")
 
