@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Inter, Cormorant_Garamond, Press_Start_2P, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/smooth-scroll";
@@ -105,6 +106,7 @@ export default function RootLayout({
         <SmoothScroll />
         <ScrollReveal />
         {children}
+        <Analytics />
       </body>
     </html>
   );
