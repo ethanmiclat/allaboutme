@@ -2,10 +2,16 @@
 # site: the browser-tab / home-screen icon and the card that unfurls when the URL
 # is pasted into iMessage, Slack, Discord, X, LinkedIn…
 #
-#   src/app/icon.svg              cursive "EM" monogram, vector (modern browsers)
+#   src/app/icon.svg              cursive "EM" monogram, vector, transparent bg
 #   src/app/favicon.ico           the same monogram at 16/32/48 (legacy browsers)
 #   src/app/apple-icon.png        180x180, full-bleed (iOS rounds it itself)
 #   src/app/opengraph-image.jpg   1200x630 social card — the hero, re-framed
+#
+# icon.svg / favicon.ico are transparent so they sit on whatever chrome color
+# the browser gives them, and use dark ink rather than the site's cream accent
+# — cream nearly disappears against the light tab bar most browsers still
+# default to. apple-icon.png keeps its solid tile: iOS still fills transparent
+# pixels in with black on plenty of devices, so it isn't worth the risk there.
 #
 # Next picks all four up by filename (see the app-icons / opengraph-image file
 # conventions) — nothing imports them.
@@ -74,9 +80,10 @@ GLYPH_WIDTH = 0.80
 GLYPH_NUDGE_Y = -0.015
 # Outward thickening of every stroke, as a fraction of the tile. Great Vibes'
 # hairlines are thinner than one device pixel at tab size and drop out to
-# nothing; this is optical-size compensation, kept small enough that the script
-# still looks like a script at 512. Anything past ~0.010 turns it into a blob.
-GLYPH_WEIGHT = 0.008
+# nothing; this is optical-size compensation as much as a style choice, kept
+# proportional so all four faces read as the same weight. Past ~0.016 the
+# counters (the loops inside the E and M) start filling in and it blobs.
+GLYPH_WEIGHT = 0.012
 
 
 def monogram_outline(font_path: Path):
@@ -109,7 +116,7 @@ def monogram_outline(font_path: Path):
 
 
 def write_icon_svg(font_path: Path, size: int = 512) -> None:
-    """The vector icon: cream monogram on a rounded slate tile."""
+    """The vector icon: bold dark-ink monogram, transparent background."""
     path, (x0, y0, x1, y1), _upm = monogram_outline(font_path)
     scale = (GLYPH_WIDTH * size) / (x1 - x0)
     # Flip Y, then land the ink's center on the tile's (nudged) center.
@@ -120,9 +127,8 @@ def write_icon_svg(font_path: Path, size: int = 512) -> None:
     # divide by the group's scale because it's applied in font units.
     stroke = 2 * GLYPH_WEIGHT * size / scale
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {size} {size}" width="{size}" height="{size}">
-  <rect width="{size}" height="{size}" rx="{round(size * 0.22)}" fill="rgb{SLATE}"/>
   <g transform="translate({tx:.2f} {ty:.2f}) scale({scale:.5f} {-scale:.5f})">
-    <path fill="rgb{CREAM}" stroke="rgb{CREAM}" stroke-width="{stroke:.1f}"
+    <path fill="rgb{SLATE}" stroke="rgb{SLATE}" stroke-width="{stroke:.1f}"
           stroke-linejoin="round" stroke-linecap="round" d="{path}"/>
   </g>
 </svg>
@@ -131,23 +137,27 @@ def write_icon_svg(font_path: Path, size: int = 512) -> None:
     print("wrote src/app/icon.svg")
 
 
-def render_monogram(font_path: Path, size: int, radius_frac: float) -> Image.Image:
-    """Raster tile, drawn 4x and downsampled so the hairlines survive.
+def render_monogram(
+    font_path: Path, size: int, ink, bg=None, radius_frac: float = 0
+) -> Image.Image:
+    """Raster tile, drawn 8x and downsampled so the hairlines survive.
 
     Great Vibes' thin strokes drop out entirely if rasterized straight at 16 or
-    32px; supersampling turns them into soft grays instead of gaps.
+    32px; supersampling turns them into soft grays instead of gaps. `bg=None`
+    leaves the tile transparent; otherwise it's filled (rounded if radius_frac).
     """
     ss = 8
     box = size * ss
     tile = Image.new("RGBA", (box, box), (0, 0, 0, 0))
-    if radius_frac:
-        mask = Image.new("L", (box, box), 0)
-        ImageDraw.Draw(mask).rounded_rectangle(
-            (0, 0, box - 1, box - 1), radius=round(box * radius_frac), fill=255
-        )
-        tile.paste(Image.new("RGBA", (box, box), (*SLATE, 255)), mask=mask)
-    else:
-        tile.paste(Image.new("RGBA", (box, box), (*SLATE, 255)))
+    if bg is not None:
+        if radius_frac:
+            mask = Image.new("L", (box, box), 0)
+            ImageDraw.Draw(mask).rounded_rectangle(
+                (0, 0, box - 1, box - 1), radius=round(box * radius_frac), fill=255
+            )
+            tile.paste(Image.new("RGBA", (box, box), (*bg, 255)), mask=mask)
+        else:
+            tile.paste(Image.new("RGBA", (box, box), (*bg, 255)))
 
     # Match the SVG's framing: scale by ink width, center on the ink's bbox.
     probe = ImageFont.truetype(str(font_path), 100)
@@ -163,22 +173,25 @@ def render_monogram(font_path: Path, size: int, radius_frac: float) -> Image.Ima
         ),
         MONOGRAM,
         font=font,
-        fill=(*CREAM, 255),
+        fill=(*ink, 255),
         stroke_width=round(box * GLYPH_WEIGHT),
-        stroke_fill=(*CREAM, 255),
+        stroke_fill=(*ink, 255),
     )
     return tile.resize((size, size), Image.LANCZOS)
 
 
 def write_raster_icons(font_path: Path) -> None:
-    # iOS applies its own rounding + it dislikes transparency, so ship it square.
-    render_monogram(font_path, 180, radius_frac=0).convert("RGB").save(
+    # iOS applies its own rounding + it dislikes transparency, so ship it square
+    # and opaque — same tile look the icon used to have everywhere.
+    render_monogram(font_path, 180, ink=CREAM, bg=SLATE).convert("RGB").save(
         APP / "apple-icon.png"
     )
     print("wrote src/app/apple-icon.png")
 
+    # Transparent + dark ink so it holds up on the light tab bar most browsers
+    # still default to (cream would all but vanish there).
     sizes = [16, 32, 48]
-    largest = render_monogram(font_path, sizes[-1], radius_frac=0.22)
+    largest = render_monogram(font_path, sizes[-1], ink=SLATE)
     largest.save(APP / "favicon.ico", sizes=[(s, s) for s in sizes])
     print("wrote src/app/favicon.ico")
 
