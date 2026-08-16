@@ -15,6 +15,24 @@ export default function ProjectFolder() {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const previewRef = useRef<HTMLDivElement | null>(null);
   const sheetRefs = useRef<(HTMLElement | null)[]>([]);
+  const folderRef = useRef<HTMLDivElement | null>(null);
+
+  // The Projects section sits well down the homepage — without this, the
+  // effect below would start the active preview decoding the instant the
+  // page mounts, looping away in the background for as long as a visitor
+  // sits up on the hero/about sections. Gate playback to when the folder is
+  // actually on screen.
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = folderRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => setInView(Boolean(entries[0]?.isIntersecting)),
+      { rootMargin: "200px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   // The sheets stack in one grid cell, so the tallest one would set the
   // preview box's height — leaving its outline hanging below a shorter
@@ -39,14 +57,16 @@ export default function ProjectFolder() {
     return () => ro.disconnect();
   }, [active]);
 
-  // Only the visible sheet's recording plays; the rest pause where they are.
+  // Only the active sheet's recording plays, and only while the folder is
+  // actually in view; every other video (and all of them once scrolled away)
+  // stays paused.
   useEffect(() => {
     videoRefs.current.forEach((v, i) => {
       if (!v) return;
-      if (i === active) v.play().catch(() => {});
+      if (i === active && inView) v.play().catch(() => {});
       else v.pause();
     });
-  }, [active]);
+  }, [active, inView]);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     const dir =
@@ -92,7 +112,7 @@ export default function ProjectFolder() {
   const mid = Math.ceil(PROJECTS.length / 2);
 
   return (
-    <div className="folder">
+    <div className="folder" ref={folderRef}>
       <div
         className="folder__tabs folder__tabs--left"
         role="tablist"
