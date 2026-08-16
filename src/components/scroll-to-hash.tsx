@@ -131,23 +131,25 @@ export default function ScrollToHash() {
     // dev double-mount) re-land on the section top instead of the panel.
     let settled = false;
 
-    const apply = () => {
-      ticking = false;
-      // The section whose top has most recently passed a probe line a third of
-      // the way down the viewport is the one being read.
-      //
-      // Positions come from the offsetTop chain against scrollY, NOT
-      // getBoundingClientRect: this handler runs in the same frame as the hero
-      // handoff's scroll handler but BEFORE it, so rects still reflect the
-      // previous frame's `.content` transform — after a fast jump that skews
-      // every rect by up to a viewport and the wrong hash sticks. offsetTop is
-      // transform-immune. (For a STUCK sticky hobby panel, Chrome's offsetTop
-      // reports the stuck position, making top - scrollY = 0 — i.e. "this
-      // panel is on screen now" — which is exactly the right answer here.)
-      const probe = window.innerHeight * 0.35;
-      const y = window.scrollY;
-      let activeId = sections[0].id;
-      for (const s of sections) {
+    // Positions come from the offsetTop chain against scrollY, NOT
+    // getBoundingClientRect: this handler runs in the same frame as the hero
+    // handoff's scroll handler but BEFORE it, so rects still reflect the
+    // previous frame's `.content` transform — after a fast jump that skews
+    // every rect by up to a viewport and the wrong hash sticks. offsetTop is
+    // transform-immune. (For a STUCK sticky hobby panel, Chrome's offsetTop
+    // reports the stuck position, making top - scrollY = 0 — i.e. "this
+    // panel is on screen now" — which is exactly the right answer here.)
+    //
+    // These positions don't move while scrolling — only the document's flow
+    // layout changes them, not scroll position — so they're measured once
+    // (and re-measured on resize/content-size changes) rather than walked on
+    // every scroll frame. Reading offsetTop live on every frame, right after
+    // the hero handoff's per-frame style writes, was forcing a full
+    // synchronous layout recalculation tens of thousands of times over a few
+    // seconds of scrolling — the site's actual "laggy" bottleneck.
+    let tops: number[] = [];
+    const measure = () => {
+      tops = sections.map((s) => {
         let top = 0;
         for (
           let node: HTMLElement | null = s;
@@ -156,7 +158,20 @@ export default function ScrollToHash() {
         ) {
           top += node.offsetTop;
         }
-        if (top - y <= probe) activeId = s.id;
+        return top;
+      });
+    };
+    measure();
+
+    const apply = () => {
+      ticking = false;
+      // The section whose top has most recently passed a probe line a third of
+      // the way down the viewport is the one being read.
+      const probe = window.innerHeight * 0.35;
+      const y = window.scrollY;
+      let activeId = sections[0].id;
+      for (let i = 0; i < sections.length; i++) {
+        if (tops[i] - y <= probe) activeId = sections[i].id;
       }
       const first = !settled;
       settled = true;
@@ -177,9 +192,32 @@ export default function ScrollToHash() {
       requestAnimationFrame(apply);
     };
 
+    // Re-measure whenever the document's flow layout could have shifted:
+    // viewport resize, or content growing/shrinking (web fonts swapping in,
+    // images finishing decode, the project folder's ResizeObserver-driven
+    // height sync, etc.) — both are rare compared to scroll events, so this
+    // doesn't reintroduce the thrashing the caching above avoids.
+    let remeasureTicking = false;
+    const scheduleRemeasure = () => {
+      if (remeasureTicking) return;
+      remeasureTicking = true;
+      requestAnimationFrame(() => {
+        remeasureTicking = false;
+        measure();
+        apply();
+      });
+    };
+    window.addEventListener("resize", scheduleRemeasure);
+    const ro = new ResizeObserver(scheduleRemeasure);
+    ro.observe(document.body);
+
     window.addEventListener("scroll", onScroll, { passive: true });
     apply();
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", scheduleRemeasure);
+      ro.disconnect();
+    };
   }, []);
 
   return null;
