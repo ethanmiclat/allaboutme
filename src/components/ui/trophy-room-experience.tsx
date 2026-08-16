@@ -208,6 +208,30 @@ function TrophyMedia({
   return <StatueArt statue={statue} />;
 }
 
+/** Mounts its statue only once the tile nears the viewport, and keeps it
+    mounted after that (never tears back down on scroll-away). A shelf of a
+    dozen-plus trophies would otherwise open that many live WebGL contexts —
+    each with its own Environment cubemap pass — the moment the hall's
+    curtains part, well before most of them have scrolled into view. */
+function useInView(rootMargin = "400px") {
+  const ref = useRef<HTMLButtonElement | null>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    if (inView) return;
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) setInView(true);
+      },
+      { rootMargin }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [inView, rootMargin]);
+  return [ref, inView] as const;
+}
+
 function TrophyPiece({
   trophy,
   fallback,
@@ -224,8 +248,10 @@ function TrophyPiece({
   // teams/players set it explicitly since their statue is a crest / shape.
   const emblem =
     trophy.emblem ?? (SPORT_STATUES.has(statue) ? (statue as Emblem) : undefined);
+  const [ref, inView] = useInView();
   return (
     <button
+      ref={ref}
       type="button"
       className={`trophy${trophy.wide ? " trophy--wide" : ""}`}
       style={{ ["--i" as string]: index }}
@@ -234,7 +260,15 @@ function TrophyPiece({
       aria-label={`Take a closer look at ${trophy.title}`}
     >
       <span className="trophy__spot" aria-hidden="true" />
-      <TrophyMedia trophy={trophy} statue={statue} />
+      {/* Below the fold, hold the tile's shape with an inert placeholder
+          rather than paying for a model load and a WebGL context. */}
+      {inView ? (
+        <TrophyMedia trophy={trophy} statue={statue} />
+      ) : trophy.model ? (
+        <span className="trophy__canvas" aria-hidden="true" />
+      ) : (
+        <TrophyMedia trophy={trophy} statue={statue} />
+      )}
       <span className="trophy__plinth" aria-hidden="true">
         <span className="trophy__plate">
           {emblem && <EmblemArt emblem={emblem} />}

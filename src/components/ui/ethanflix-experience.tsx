@@ -165,7 +165,7 @@ function Row({ category, items }: { category: string; items: FlixItem[] }) {
     let raf = 0;
     let acc = 0;
     const tick = () => {
-      if (!pausedRef.current && !drag.current.active) {
+      if (!pausedRef.current && !drag.current.active && !document.hidden) {
         acc += DRIFT_SPEED;
         const step = Math.floor(acc);
         if (step) {

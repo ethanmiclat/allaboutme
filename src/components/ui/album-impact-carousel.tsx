@@ -17,6 +17,12 @@ import SongPlayback, {
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Touch browsers resize the visual viewport as their chrome slides away mid
+// scroll. Left alone that reads as a resize and refreshes the pin, which
+// jitters it. Phones never reach the pin (it's gated to >=769px below), but
+// tablets do, so tell ScrollTrigger to ignore those height changes.
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 // Columns are defined explicitly in albums.ts (left, middle, right).
 const [COL_1, COL_2, COL_3] = ALBUM_COLUMNS;
 

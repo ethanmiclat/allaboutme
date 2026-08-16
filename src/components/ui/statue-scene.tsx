@@ -38,6 +38,21 @@ function usePrefersReducedMotion() {
   );
 }
 
+/** Tracks tab visibility so an "always" frameloop can stand down while the
+    page is backgrounded — a `frameloop="always"` canvas renders every frame
+    regardless of whether anything moved, so without this it burns GPU
+    indefinitely the moment the tab is out of focus. */
+function usePageVisible() {
+  return useSyncExternalStore(
+    (onChange) => {
+      document.addEventListener("visibilitychange", onChange);
+      return () => document.removeEventListener("visibilitychange", onChange);
+    },
+    () => document.visibilityState === "visible",
+    () => true
+  );
+}
+
 /** Drag / hover state shared between the wrapper span's pointer handlers
     (outside the canvas) and the Turntable frame loop (inside it). `invalidate`
     is r3f's on-demand render trigger, stored here so the outside-the-canvas
@@ -161,6 +176,7 @@ export default function StatueScene({
   interactive?: boolean;
 }) {
   const reducedMotion = usePrefersReducedMotion();
+  const pageVisible = usePageVisible();
   const manual = useRef<ManualSpin>({
     extra: 0,
     dragging: false,
@@ -172,8 +188,10 @@ export default function StatueScene({
   // shelf tiles render on demand (static until hovered), so a wall of statues
   // isn't 14 canvases all rendering every frame — the source of the page's
   // half-framerate. Reduced motion drops idle spin but keeps drag responsive.
-  const alwaysSpin = interactive && !reducedMotion;
-  const frameloop = interactive ? "always" : "demand";
+  // Tab-hidden drops back to demand too, so the "always" loop doesn't keep
+  // rendering every frame while nobody's looking at it.
+  const alwaysSpin = interactive && !reducedMotion && pageVisible;
+  const frameloop = interactive && pageVisible ? "always" : "demand";
 
   const dragHandlers = interactive
     ? {

@@ -36,6 +36,10 @@ export interface EngineLevel {
   ability?: LevelAbility;
 }
 
+/** The four things a player can do, however they're asking for it (keys or
+    the on-screen touch pad). */
+export type PlatformerAction = "left" | "right" | "jump" | "down";
+
 export interface EngineCallbacks {
   onWin: () => void;
   /** Fired on every respawn (spikes, chase wall, falling out). */
@@ -88,7 +92,7 @@ export class PlatformerEngine {
   private time = 0;
   private won = false;
 
-  private keys = new Set<string>();
+  private keys = new Set<PlatformerAction>();
   private raf = 0;
   private last = 0;
   private acc = 0;
@@ -126,6 +130,7 @@ export class PlatformerEngine {
   start() {
     window.addEventListener("keydown", this.onKeyDown);
     window.addEventListener("keyup", this.onKeyUp);
+    document.addEventListener("visibilitychange", this.onVisibility);
     this.last = performance.now();
     this.raf = requestAnimationFrame(this.frame);
   }
@@ -135,9 +140,48 @@ export class PlatformerEngine {
     cancelAnimationFrame(this.raf);
     window.removeEventListener("keydown", this.onKeyDown);
     window.removeEventListener("keyup", this.onKeyUp);
+    document.removeEventListener("visibilitychange", this.onVisibility);
+  }
+
+  // A backgrounded tab has no business still stepping physics and repainting
+  // the canvas every frame — stop the loop outright and pick back up cleanly
+  // (dt is clamped in `frame`, so a stale `last` on resume can't cause a
+  // catch-up jump).
+  private onVisibility = () => {
+    if (document.hidden) {
+      cancelAnimationFrame(this.raf);
+      this.raf = 0;
+    } else if (!this.destroyed && !this.raf) {
+      this.last = performance.now();
+      this.raf = requestAnimationFrame(this.frame);
+    }
+  };
+
+  /** Press an action from something other than the keyboard (the on-screen
+      touch pad). Same path the keys take, so touch gets the jump buffer and
+      hold-to-mine for free. */
+  press(action: PlatformerAction) {
+    this.setKey(action, true);
+  }
+
+  /** Release an action pressed via `press`. */
+  release(action: PlatformerAction) {
+    this.setKey(action, false);
   }
 
   // ------------------------------------------------------------- input ----
+
+  /** The one place `keys` is mutated, so keyboard and touch can't drift apart.
+      Arming the jump buffer is edge-triggered — only on the press that
+      actually changes the state, never on OS key-repeat or a double press(). */
+  private setKey(action: PlatformerAction, down: boolean) {
+    if (!down) {
+      this.keys.delete(action);
+      return;
+    }
+    if (action === "jump" && !this.keys.has("jump")) this.jumpBuf = JUMP_BUFFER;
+    this.keys.add(action);
+  }
 
   private onKeyDown = (e: KeyboardEvent) => {
     const k = e.key;
@@ -146,21 +190,18 @@ export class PlatformerEngine {
     ) {
       e.preventDefault();
     }
-    if (k === "ArrowUp" || k === "w" || k === " ") {
-      if (!this.keys.has("jump")) this.jumpBuf = JUMP_BUFFER;
-      this.keys.add("jump");
-    }
-    if (k === "ArrowLeft" || k === "a") this.keys.add("left");
-    if (k === "ArrowRight" || k === "d") this.keys.add("right");
-    if (k === "ArrowDown" || k === "s") this.keys.add("down");
+    if (k === "ArrowUp" || k === "w" || k === " ") this.setKey("jump", true);
+    if (k === "ArrowLeft" || k === "a") this.setKey("left", true);
+    if (k === "ArrowRight" || k === "d") this.setKey("right", true);
+    if (k === "ArrowDown" || k === "s") this.setKey("down", true);
   };
 
   private onKeyUp = (e: KeyboardEvent) => {
     const k = e.key;
-    if (k === "ArrowUp" || k === "w" || k === " ") this.keys.delete("jump");
-    if (k === "ArrowLeft" || k === "a") this.keys.delete("left");
-    if (k === "ArrowRight" || k === "d") this.keys.delete("right");
-    if (k === "ArrowDown" || k === "s") this.keys.delete("down");
+    if (k === "ArrowUp" || k === "w" || k === " ") this.setKey("jump", false);
+    if (k === "ArrowLeft" || k === "a") this.setKey("left", false);
+    if (k === "ArrowRight" || k === "d") this.setKey("right", false);
+    if (k === "ArrowDown" || k === "s") this.setKey("down", false);
   };
 
   // -------------------------------------------------------------- loop ----

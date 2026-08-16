@@ -67,7 +67,7 @@ export default function ArcadeExperience() {
           {/* eslint-disable-next-line @next/next/no-img-element -- public static art; next/image adds no value here */}
           <img
             className="arcade-scene__img"
-            src="/assets/arcade-scene.png"
+            src="/assets/arcade-scene.jpg"
             alt="A retro black-and-white arcade with three cabinets; Ethan's Arcade is the machine in the center"
           />
 
@@ -103,11 +103,18 @@ export default function ArcadeExperience() {
         </div>
       </div>
 
-      {/* Hint line — only on the full screen (the room is left clean). */}
+      {/* Hint line — only on the full screen (the room is left clean). There
+          are no arrows or Esc to press on a touchscreen, so that wording is
+          swapped for the tap equivalents; CSS picks which one shows. */}
       {stage === "screen" && (
-        <p className="arcade-stage__tagline">
-          ARROWS TO NAVIGATE • ENTER TO PLAY • ESC TO STEP OUT
-        </p>
+        <>
+          <p className="arcade-stage__tagline">
+            ARROWS TO NAVIGATE • ENTER TO PLAY • ESC TO STEP OUT
+          </p>
+          <p className="arcade-stage__tagline arcade-stage__tagline--touch">
+            TAP A GAME TO PLAY • BACK TO STEP OUT
+          </p>
+        </>
       )}
     </div>
   );

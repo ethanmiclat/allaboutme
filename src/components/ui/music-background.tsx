@@ -108,6 +108,22 @@ export default function MusicBackground() {
       raf = requestAnimationFrame(draw);
     };
 
+    // Tab-hidden pauses the loop outright rather than just skipping the
+    // paint — this is a continuous canvas redraw, so left unchecked it keeps
+    // costing GPU/battery for as long as the music page sits in a background
+    // tab.
+    const startLoop = () => {
+      if (!raf) raf = requestAnimationFrame(draw);
+    };
+    const stopLoop = () => {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    };
+    const onVisibility = () => {
+      if (document.hidden) stopLoop();
+      else startLoop();
+    };
+
     if (reduceMotion) {
       // Single static frame: gentle frozen waves, no cursor/playback response.
       ctx.clearRect(0, 0, w, h);
@@ -124,11 +140,13 @@ export default function MusicBackground() {
         ctx.stroke();
       }
     } else {
-      raf = requestAnimationFrame(draw);
+      document.addEventListener("visibilitychange", onVisibility);
+      if (!document.hidden) startLoop();
     }
 
     return () => {
-      cancelAnimationFrame(raf);
+      stopLoop();
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerout", onLeave);

@@ -1780,6 +1780,8 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
   opacity: 0.65;
   letter-spacing: 1px;
 }
+/* The touch wording swaps in for the keyboard wording further down. */
+.platformer__hint--touch { display: none; }
 .platformer__action {
   border: 0;
   background: transparent;
@@ -1792,6 +1794,56 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
 }
 .platformer__action:hover { background: var(--ac-ink); color: #000; }
 .platformer__action:focus-visible { outline: 2px solid var(--ac-ink); outline-offset: 3px; }
+
+/* On-screen pad — the only way to play without a keyboard. Move cluster left,
+   jump/mine cluster right (the usual twin-cluster layout). It lays over the
+   stage rather than stealing height from it, so the canvas keeps the same
+   letterboxed size it has on desktop; on a portrait phone the buttons mostly
+   land in the letterbox bars anyway. Hidden until the `hover: none` block
+   below turns it on. */
+.platformer__pad {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: none;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: clamp(10px, 3vw, 24px);
+  /* Inert by construction: only the buttons themselves take pointers. */
+  pointer-events: none;
+}
+.platformer__pad-group {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(8px, 2vw, 14px);
+}
+.platformer__pad-btn {
+  width: clamp(44px, 11vw, 58px);
+  height: clamp(44px, 11vw, 58px);
+  display: grid;
+  place-items: center;
+  border: 1.5px solid rgba(232, 232, 232, 0.5);
+  border-radius: 50%;
+  background: rgba(232, 232, 232, 0.12);
+  color: var(--ac-ink);
+  font-size: clamp(14px, 4vw, 18px);
+  line-height: 1;
+  pointer-events: auto;
+  /* A held mine button must not pan the page, raise the iOS callout, select
+     the glyph, or flash a tap highlight. Same touch-action reasoning as the
+     drag-to-turn statue canvas. */
+  touch-action: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.platformer__pad-btn:active { background: rgba(232, 232, 232, 0.34); }
+
+@media (hover: none) {
+  .platformer__pad { display: flex; }
+  .platformer__hint { display: none; }
+  .platformer__hint--touch { display: block; }
+}
 
 @media (max-width: 640px) {
   .platformer-hub__grid { grid-template-columns: repeat(2, 1fr); }
@@ -1813,6 +1865,12 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
   color: var(--ac-ink);
   text-shadow: 0 2px 6px #000, 0 0 10px #000;
   pointer-events: none;
+}
+/* The tap wording replaces the key wording on touch (see the pad rules above). */
+.arcade-stage__tagline--touch { display: none; }
+@media (hover: none) {
+  .arcade-stage__tagline:not(.arcade-stage__tagline--touch) { display: none; }
+  .arcade-stage__tagline--touch { display: block; }
 }
 
 /* Pixel-styled fixed Back button */
