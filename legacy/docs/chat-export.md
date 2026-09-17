@@ -36,7 +36,6 @@ biography/description copy across the site.
 - **Name:** Ethan Miclat
 - **School:** University of Arkansas — Walton Honors College of Business
 - **Academic track:** Business Finance
-- **Career path:** Pre-dental
 - **Self-description / tagline (user's own words):** "A family-driven student who dreams big and always looks to be a positive, genuine, and good person."
 - **Contact email (system context):** ethanmic6@gmail.com
 

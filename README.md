@@ -260,8 +260,8 @@ so order matters (the file is grouped/commented by column).
 
 ## Content facts (confirmed)
 
-- University of Arkansas — **Walton Honors College of Business**; **Business Finance** track,
-  **pre-dental** path. Based in **Fayetteville, Arkansas**. Email: ethanmic6@gmail.com
+- University of Arkansas — **Walton Honors College of Business**; **Business Finance** track.
+  Based in **Fayetteville, Arkansas**. Email: ethanmic6@gmail.com
 - Tagline: *"A family-driven student who dreams big and always looks to be a positive,
   genuine, and good person."*
 - Project: **Rebel Hauling** (rebelhauling.com).

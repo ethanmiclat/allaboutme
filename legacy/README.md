@@ -101,7 +101,7 @@ ethanmiclat/
 ## About Ethan (confirmed content facts)
 
 - University of Arkansas — **Walton Honors College of Business**
-- Track: **Business Finance** · Path: **Pre-dental**
+- Track: **Business Finance**
 - Based in **Fayetteville, Arkansas**
 - Tagline (his words): *"A family-driven student who dreams big and always looks to be a
   positive, genuine, and good person."*

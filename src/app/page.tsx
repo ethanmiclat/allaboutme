@@ -83,9 +83,8 @@ export default function Home() {
               <p className="lede">
                 Hey! I&rsquo;m Ethan Miclat and I am currently a student at
                 the University of Arkansas&rsquo; Walton Honors College of
-                Business. I am majoring in Finance while on a pre-dental
-                track (taking prerequisites for dental school as well). Thank
-                You for visiting my website I hope you enjoy!
+                Business. I am majoring in Finance. Thank You for visiting my
+                website I hope you enjoy!
               </p>
 
               <div className="timeline reveal">
@@ -102,7 +101,7 @@ export default function Home() {
                       Business
                     </h4>
                     <p className="timeline__text">
-                      Business&nbsp;Finance track, pursuing a pre-dental path.
+                      Business&nbsp;Finance track.
                     </p>
                   </li>
                   <li className="timeline__item">
