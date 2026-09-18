@@ -1,16 +1,30 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowUpRight, Info } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Info } from "lucide-react";
 import { PROJECTS } from "@/lib/projects";
 
+/** Folders shown at once — half in each column flanking the preview. */
+const PAGE_SIZE = 6;
+const PAGES = Math.ceil(PROJECTS.length / PAGE_SIZE);
+const pageOf = (i: number) => Math.floor(i / PAGE_SIZE);
+
 /**
- * Interactive "project folder": file-divider tabs on the left, a preview
- * sheet on the right. Hovering or focusing a tab previews that project;
- * the sheet crossfades and its screen recording starts playing.
+ * Interactive "project folder": file-divider tabs flank a preview sheet.
+ * Hovering or focusing a tab previews that project; the sheet crossfades and
+ * its screen recording starts playing. With more than one page of projects,
+ * arrows on the outer edges page through the tabs — the preview stays put
+ * until a tab on the new page is picked.
  */
 export default function ProjectFolder() {
   const [active, setActive] = useState(0);
+  const [page, setPage] = useState(0);
+  // Which way the last page turn went, so the incoming tabs slide in from
+  // that side.
+  const [dir, setDir] = useState(1);
+  // Keyboard nav can cross onto another page; the target tab only exists
+  // after that page renders, so focus it in an effect.
+  const focusNext = useRef<number | null>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const previewRef = useRef<HTMLDivElement | null>(null);
@@ -68,6 +82,17 @@ export default function ProjectFolder() {
     });
   }, [active, inView]);
 
+  useEffect(() => {
+    if (focusNext.current === null) return;
+    tabRefs.current[focusNext.current]?.focus();
+    focusNext.current = null;
+  }, [page, active]);
+
+  const turnPage = (step: number) => {
+    setDir(step);
+    setPage((p) => (p + step + PAGES) % PAGES);
+  };
+
   const onKeyDown = (e: React.KeyboardEvent) => {
     const dir =
       e.key === "ArrowDown" || e.key === "ArrowRight"
@@ -78,8 +103,12 @@ export default function ProjectFolder() {
     if (!dir) return;
     e.preventDefault();
     const next = (active + dir + PROJECTS.length) % PROJECTS.length;
+    if (pageOf(next) !== page) {
+      setDir(dir);
+      setPage(pageOf(next));
+    }
     setActive(next);
-    tabRefs.current[next]?.focus();
+    focusNext.current = next;
   };
 
   // Tabs are split into two columns flanking the preview; `i` stays the
@@ -95,7 +124,7 @@ export default function ProjectFolder() {
       id={`folder-tab-${p.key}`}
       aria-selected={i === active}
       aria-controls={`folder-sheet-${p.key}`}
-      tabIndex={i === active ? 0 : -1}
+      tabIndex={i === rovingTab ? 0 : -1}
       className="folder-tab"
       data-active={i === active ? "" : undefined}
       data-placeholder={p.placeholder ? "" : undefined}
@@ -109,18 +138,40 @@ export default function ProjectFolder() {
     </button>
   );
 
-  const mid = Math.ceil(PROJECTS.length / 2);
+  const start = page * PAGE_SIZE;
+  const onPage = PROJECTS.slice(start, start + PAGE_SIZE);
+  const mid = Math.ceil(onPage.length / 2);
+  // The one tab reachable with Tab: the active one if it's on this page,
+  // otherwise the page's first.
+  const rovingTab = pageOf(active) === page ? active : start;
 
   return (
-    <div className="folder" ref={folderRef}>
+    <div
+      className="folder"
+      ref={folderRef}
+      data-paged={PAGES > 1 ? "" : undefined}
+    >
+      {PAGES > 1 && (
+        <button
+          type="button"
+          className="folder__arrow folder__arrow--prev"
+          aria-label="Previous projects"
+          onClick={() => turnPage(-1)}
+        >
+          <ChevronLeft aria-hidden="true" />
+        </button>
+      )}
+
       <div
+        key={`left-${page}`}
         className="folder__tabs folder__tabs--left"
         role="tablist"
         aria-label="Projects"
         aria-orientation="vertical"
+        style={{ "--page-dir": dir } as React.CSSProperties}
         onKeyDown={onKeyDown}
       >
-        {PROJECTS.slice(0, mid).map((p, i) => renderTab(p, i))}
+        {onPage.slice(0, mid).map((p, i) => renderTab(p, start + i))}
       </div>
 
       <div className="folder__preview" ref={previewRef}>
@@ -200,14 +251,32 @@ export default function ProjectFolder() {
       </div>
 
       <div
+        key={`right-${page}`}
         className="folder__tabs folder__tabs--right"
         role="tablist"
         aria-label="Projects (continued)"
         aria-orientation="vertical"
+        style={{ "--page-dir": dir } as React.CSSProperties}
         onKeyDown={onKeyDown}
       >
-        {PROJECTS.slice(mid).map((p, i) => renderTab(p, i + mid))}
+        {onPage.slice(mid).map((p, i) => renderTab(p, start + mid + i))}
       </div>
+
+      {PAGES > 1 && (
+        <>
+          <button
+            type="button"
+            className="folder__arrow folder__arrow--next"
+            aria-label="Next projects"
+            onClick={() => turnPage(1)}
+          >
+            <ChevronRight aria-hidden="true" />
+          </button>
+          <p className="folder__page" aria-live="polite">
+            {page + 1} / {PAGES}
+          </p>
+        </>
+      )}
     </div>
   );
 }

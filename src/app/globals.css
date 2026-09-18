@@ -1125,6 +1125,61 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
 .folder-tab__blurb { font-size: 14px; line-height: 1.55; color: var(--text-dim); }
 .folder-tab[data-placeholder] .folder-tab__name { font-style: italic; color: var(--text-dim); }
 
+/* ---- Paging: with more than one page of projects, round arrows sit on the
+   outer edges and page the two tab columns. The preview column never moves. */
+.folder[data-paged] {
+  grid-template-columns: auto 4fr 7fr 4fr auto;
+  grid-template-areas:
+    "prev left preview right next"
+    ".    .    page    .     .";
+}
+.folder[data-paged] .folder__tabs--left { grid-area: left; }
+.folder[data-paged] .folder__tabs--right { grid-area: right; }
+.folder[data-paged] .folder__preview { grid-area: preview; }
+.folder__arrow--prev { grid-area: prev; }
+.folder__arrow--next { grid-area: next; }
+
+.folder__arrow {
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--hairline);
+  border-radius: 100px;
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+.folder__arrow svg { width: 22px; height: 22px; }
+.folder__arrow:hover { border-color: rgba(246, 234, 210, 0.42); }
+.folder__arrow--prev:hover { transform: translateX(-3px); }
+.folder__arrow--next:hover { transform: translateX(3px); }
+.folder__arrow:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
+
+.folder__page {
+  grid-area: page;
+  justify-self: center;
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Each page turn remounts the tab columns; slide them in from the side the
+   visitor paged toward (--page-dir is 1 for next, -1 for previous). */
+.folder[data-paged] .folder__tabs {
+  animation: folder-page-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes folder-page-in {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--page-dir, 1) * 40px));
+  }
+}
+
 /* Preview pane: the open folder the active sheet sits in. Its height is set
    in JS to hug the ACTIVE sheet (project-folder.tsx), so the outline always
    ends just under that sheet's "Visit Site" link — the grid stack alone would
@@ -1443,6 +1498,18 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
   .folder-tab[data-active] { transform: none; }
   /* Undo the right column's mirror when it's a horizontal strip. */
   .folder__tabs--right .folder-tab { text-align: left; align-items: flex-start; }
+
+  /* Paged: strips stack around the preview, arrows and the page count
+     share one row underneath. */
+  .folder[data-paged] {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "left left left"
+      "preview preview preview"
+      "right right right"
+      "prev page next";
+  }
+  .folder__page { align-self: center; }
 }
 
 @media (max-width: 600px) {
