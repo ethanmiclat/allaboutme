@@ -1168,15 +1168,30 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
   font-variant-numeric: tabular-nums;
 }
 
-/* Each page turn remounts the tab columns; slide them in from the side the
-   visitor paged toward (--page-dir is 1 for next, -1 for previous). */
+/* A page turn is two steps: the current columns ease out toward the side
+   being left (PAGE_EXIT_MS in project-folder.tsx matches this duration),
+   then the next page's columns remount and glide in from the other side.
+   --page-dir is 1 for next, -1 for previous; the right column trails the
+   left slightly so the pair reads as a wave rather than a jump cut. */
 .folder[data-paged] .folder__tabs {
-  animation: folder-page-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: folder-page-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
+.folder[data-paged] .folder__tabs--right { animation-delay: 0.08s; }
+.folder[data-leaving] .folder__tabs {
+  animation: folder-page-out 0.38s cubic-bezier(0.55, 0, 0.75, 0.3) forwards;
+  pointer-events: none;
+}
+.folder[data-leaving] .folder__tabs--right { animation-delay: 0s; }
 @keyframes folder-page-in {
   from {
     opacity: 0;
-    transform: translateX(calc(var(--page-dir, 1) * 40px));
+    transform: translateX(calc(var(--page-dir, 1) * 56px));
+  }
+}
+@keyframes folder-page-out {
+  to {
+    opacity: 0;
+    transform: translateX(calc(var(--page-dir, 1) * -56px));
   }
 }
 

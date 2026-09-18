@@ -8,6 +8,9 @@ import { PROJECTS } from "@/lib/projects";
 const PAGE_SIZE = 6;
 const PAGES = Math.ceil(PROJECTS.length / PAGE_SIZE);
 const pageOf = (i: number) => Math.floor(i / PAGE_SIZE);
+/** How long the outgoing folders take to slide away — matches the
+    folder-page-out animation in globals.css. */
+const PAGE_EXIT_MS = 380;
 
 /**
  * Interactive "project folder": file-divider tabs flank a preview sheet.
@@ -22,6 +25,11 @@ export default function ProjectFolder() {
   // Which way the last page turn went, so the incoming tabs slide in from
   // that side.
   const [dir, setDir] = useState(1);
+  // True while the current page's folders slide out, before the next page
+  // mounts and slides in.
+  const [leaving, setLeaving] = useState(false);
+  const leaveTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(leaveTimer.current), []);
   // Keyboard nav can cross onto another page; the target tab only exists
   // after that page renders, so focus it in an effect.
   const focusNext = useRef<number | null>(null);
@@ -89,8 +97,18 @@ export default function ProjectFolder() {
   }, [page, active]);
 
   const turnPage = (step: number) => {
+    if (leaving) return;
     setDir(step);
-    setPage((p) => (p + step + PAGES) % PAGES);
+    const flip = () => setPage((p) => (p + step + PAGES) % PAGES);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      flip();
+      return;
+    }
+    setLeaving(true);
+    leaveTimer.current = window.setTimeout(() => {
+      flip();
+      setLeaving(false);
+    }, PAGE_EXIT_MS);
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
@@ -150,6 +168,7 @@ export default function ProjectFolder() {
       className="folder"
       ref={folderRef}
       data-paged={PAGES > 1 ? "" : undefined}
+      data-leaving={leaving ? "" : undefined}
     >
       {PAGES > 1 && (
         <button
