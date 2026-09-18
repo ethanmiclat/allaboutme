@@ -84,12 +84,16 @@ export const PROJECTS: Project[] = [
     poster: "/assets/tinker-poster.jpg",
   },
   {
-    key: "this-site",
-    name: "This Site!",
-    meta: "Portfolio",
-    blurb: "A personal portfolio built from scratch with Next.js.",
+    key: "footing",
+    name: "Footing",
+    meta: "Web App",
+    blurb: "Your retirement accounts and what to do next, in plain English.",
     description:
-      "This portfolio — the folder you're clicking through, the smooth scroll, the hero, all of it. Built with Next.js and TypeScript, styled with hand-written CSS, and animated with GSAP for the scroll-driven layout and transitions throughout.",
-    tagline: "You're already here.",
+      "A financial planner that puts your money moves in order — emergency fund, employer match, debt, IRA, and beyond — and tells you the one thing to do next. A Python engine projects where your accounts are headed and what it takes to hit your goal, with a React front end that explains every account in plain English.",
+    href: "https://ethanmiclat.github.io/financialplanner/",
+    linkLabel: "Visit Site",
+    note: "Demo only — you get a sample student's plan in a private sandbox that clears after a day. Not financial advice, and please don't enter real personal information.",
+    video: "/assets/footing.mp4",
+    poster: "/assets/footing-poster.jpg",
   },
 ];
