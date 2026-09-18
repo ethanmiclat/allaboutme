@@ -1174,11 +1174,11 @@ body.menu-open .menu__list li:nth-child(5) .menu__link { transition-delay: 0.30s
    --page-dir is 1 for next, -1 for previous; the right column trails the
    left slightly so the pair reads as a wave rather than a jump cut. */
 .folder[data-paged] .folder__tabs {
-  animation: folder-page-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: folder-page-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
-.folder[data-paged] .folder__tabs--right { animation-delay: 0.08s; }
+.folder[data-paged] .folder__tabs--right { animation-delay: 0.06s; }
 .folder[data-leaving] .folder__tabs {
-  animation: folder-page-out 0.38s cubic-bezier(0.55, 0, 0.75, 0.3) forwards;
+  animation: folder-page-out 0.3s cubic-bezier(0.55, 0, 0.75, 0.3) forwards;
   pointer-events: none;
 }
 .folder[data-leaving] .folder__tabs--right { animation-delay: 0s; }

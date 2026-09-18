@@ -10,7 +10,7 @@ const PAGES = Math.ceil(PROJECTS.length / PAGE_SIZE);
 const pageOf = (i: number) => Math.floor(i / PAGE_SIZE);
 /** How long the outgoing folders take to slide away — matches the
     folder-page-out animation in globals.css. */
-const PAGE_EXIT_MS = 380;
+const PAGE_EXIT_MS = 300;
 
 /**
  * Interactive "project folder": file-divider tabs flank a preview sheet.
