@@ -16,7 +16,7 @@ export default function Home() {
       <ScrollToHash />
       <SiteMenu />
       <ThemeToggle />
-      {/* Scroll runway for the sideways hero handoff — see globals.css. */}
+      {/* Scroll runway: the hero stays pinned while the content slides up over it — see globals.css. */}
       <div className="hero-runway">
         <Hero />
       </div>

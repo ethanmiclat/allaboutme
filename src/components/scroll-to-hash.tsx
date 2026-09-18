@@ -43,12 +43,10 @@ export default function ScrollToHash() {
     if (!el || !(el instanceof HTMLElement)) return;
 
     // Absolute document position to land on, via the accumulated offsetTop
-    // chain rather than getBoundingClientRect. This matters because the hero
-    // handoff applies a translateY transform to `.content`; getBoundingClientRect
-    // reflects that visual shift (skewing the target by a whole viewport, and
-    // by a varying amount depending on when it's read — the source of the
-    // intermittent wrong landing), whereas offsetTop reports the untransformed
-    // layout position. For the sticky hobby panels that flow position is exactly
+    // chain rather than getBoundingClientRect: getBoundingClientRect reflects
+    // any in-flight transform (e.g. a .reveal entrance) and varies with when
+    // it's read, whereas offsetTop reports the untransformed layout position.
+    // For the sticky hobby panels that flow position is exactly
     // the scroll offset at which the panel locks to the top of the viewport.
     const measure = () => {
       let top = 0;
@@ -132,11 +130,9 @@ export default function ScrollToHash() {
     let settled = false;
 
     // Positions come from the offsetTop chain against scrollY, NOT
-    // getBoundingClientRect: this handler runs in the same frame as the hero
-    // handoff's scroll handler but BEFORE it, so rects still reflect the
-    // previous frame's `.content` transform — after a fast jump that skews
-    // every rect by up to a viewport and the wrong hash sticks. offsetTop is
-    // transform-immune. (For a STUCK sticky hobby panel, Chrome's offsetTop
+    // getBoundingClientRect: rects reflect in-flight transforms and can lag a
+    // frame behind other scroll handlers; offsetTop is transform-immune.
+    // (For a STUCK sticky hobby panel, Chrome's offsetTop
     // reports the stuck position, making top - scrollY = 0 — i.e. "this
     // panel is on screen now" — which is exactly the right answer here.)
     //
@@ -144,7 +140,7 @@ export default function ScrollToHash() {
     // layout changes them, not scroll position — so they're measured once
     // (and re-measured on resize/content-size changes) rather than walked on
     // every scroll frame. Reading offsetTop live on every frame, right after
-    // the hero handoff's per-frame style writes, was forcing a full
+    // the hero's per-frame style writes, was forcing a full
     // synchronous layout recalculation tens of thousands of times over a few
     // seconds of scrolling — the site's actual "laggy" bottleneck.
     let tops: number[] = [];

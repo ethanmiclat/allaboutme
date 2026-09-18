@@ -122,10 +122,10 @@
    animating a scroll down from the top. */
 html {
   scroll-behavior: auto;
-  /* The scrolling element is <html>, so the hero handoff's off-screen parking
-     spot has to be clipped here — clipping only <body> still leaves the page
-     draggable sideways. `clip` (not `hidden`) creates no scroll container, so
-     sticky positioning and ScrollTrigger are unaffected. */
+  /* The scrolling element is <html>, so anything wider than the viewport has
+     to be clipped here — clipping only <body> still leaves the page draggable
+     sideways. `clip` (not `hidden`) creates no scroll container, so sticky
+     positioning and ScrollTrigger are unaffected. */
   overflow-x: clip;
 }
 
@@ -134,9 +134,8 @@ body {
   background: var(--dark);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
-  /* The hero handoff parks the content one screen to the right before sliding
-     it in; clip (not hidden) so that never becomes a horizontal scrollbar and
-     no scroll container is created to fight sticky/ScrollTrigger. */
+  /* Clip (not hidden) stray horizontal overflow so it never becomes a
+     scrollbar and no scroll container is created to fight sticky/ScrollTrigger. */
   overflow-x: clip;
 }
 
@@ -160,22 +159,16 @@ body {
 /* Hero foreground layers fade out on scroll; background stays put (driven by JS) */
 .topbar, .hero__center, .hero__footer { will-change: opacity; }
 
-/* ---- Hero handoff: the page moves SIDEWAYS, not down ----
-   For the first viewport of scrolling nothing travels vertically. The hero
-   slides off to the left while the content slides in from the right, both
-   scrubbed by `--hero-exit` (0→1, set by hero.tsx).
+/* ---- Hero overlap: the content slides up OVER the pinned hero ----
+   `.hero-runway` is two viewports tall, so the sticky hero stays pinned for
+   the first viewport of scrolling. `.content` is pulled up one viewport with
+   a negative margin, so its top starts just below the fold and rises over the
+   still hero as you scroll, like a sheet laid on top. The hero dims a little
+   as it's covered (`--hero-exit`, 0→1, set by hero.tsx) so the rising edge
+   reads as depth.
 
-   How the vertical hold works: `.hero-runway` is two viewports tall, so the
-   sticky hero stays pinned through the whole handoff. `.content` is pulled up
-   one viewport with a negative margin, putting its natural top exactly at
-   scrollY = 100dvh — the moment the handoff ends. Until then hero.tsx cancels
-   the remaining offset with a matching translateY, so the content sits still
-   at the top of the screen and only its X changes. At the end both the X and Y
-   offsets reach zero simultaneously, so normal vertical scrolling resumes with
-   no jump.
-
-   Reduced-motion users get none of this: without the media query the runway is
-   just the hero's own height and the content keeps its normal flow position. */
+   Reduced-motion users get a plain scroll: without the media query the runway
+   is just the hero's own height and the content keeps its normal position. */
 :root { --hero-exit: 0; }
 
 .hero-runway { position: relative; }
@@ -184,15 +177,10 @@ body {
   .hero-runway { height: 200dvh; }
   .content {
     margin-top: -100dvh;
-    will-change: transform;
+    /* Soft shadow on the leading edge so the sheet reads as lying on top. */
+    box-shadow: 0 -24px 60px rgba(0, 0, 0, 0.35);
   }
-  .hero {
-    /* Slides fully offstage left; kept mostly opaque so it reads as travel
-       rather than a dissolve. */
-    transform: translate3d(calc(var(--hero-exit) * -100%), 0, 0);
-    opacity: calc(1 - var(--hero-exit) * 0.4);
-    will-change: transform, opacity;
-  }
+  .hero { opacity: calc(1 - var(--hero-exit) * 0.45); }
 }
 
 /* Content layer that scrolls up and takes over the hero */
@@ -373,7 +361,7 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-6.5px) rotat
   cursor: pointer;
   transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
   /* Keep each pill on its own compositor layer. Otherwise, when an ancestor
-     animates transform — the hero handoff or a .reveal/.stagger entrance — the
+     animates transform — e.g. a .reveal/.stagger entrance — the
      browser re-rasterizes the pill's large blurred box-shadow every frame,
      which shimmers ("tweaks out"). will-change holds the layer independent of
      the pill's own transform (a plain translateZ(0) gets overridden by the
