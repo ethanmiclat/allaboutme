@@ -3,12 +3,24 @@
 import { useEffect } from "react";
 
 /**
- * Sticky hero that the rest of the page slides up over.
+ * Sticky hero that the rest of the page slides in over, from the right.
  *
- * The hero stays pinned for the first viewport of scrolling while `.content`
- * rises over it like a sheet (the runway and overlap are set up in the "Hero
- * overlap" block in globals.css). This effect just publishes scroll progress
- * as `--hero-exit` (0→1) and fades the hero's text out ahead of the cover.
+ * Scrolling through the first viewport moves nothing vertically: the hero
+ * stays pinned while `.content` slides in over it from the right like a sheet
+ * laid on top. This effect drives that from one scroll-progress value
+ * (`--hero-exit`, 0→1) — the CSS half (see the "Hero overlap" block in
+ * globals.css) sets up the runway and dims the hero; the JS half below moves
+ * the content.
+ *
+ * The content's vertical hold: globals.css pulls `.content` up by one viewport
+ * so its natural top lands at scrollY = 100dvh. Before that point we cancel the
+ * leftover distance with translateY, so the content stays level with the top
+ * of the screen and only travels horizontally. Both offsets hit zero at the
+ * same instant, so the transform can be dropped and normal scrolling continues
+ * seamlessly.
+ *
+ * Everything here is skipped under prefers-reduced-motion, which is also what
+ * gates the CSS — so the two stay consistent and the page just scrolls plainly.
  */
 export default function Hero() {
   useEffect(() => {
@@ -16,6 +28,8 @@ export default function Hero() {
     const layers = document.querySelectorAll<HTMLElement>(
       ".topbar, .hero__center, .hero__footer"
     );
+    const content = document.querySelector<HTMLElement>(".content");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let ticking = false;
     const update = () => {
       const runway = window.innerHeight;
@@ -26,6 +40,16 @@ export default function Hero() {
         el.style.opacity = opacity;
       });
       root.style.setProperty("--hero-exit", p.toFixed(4));
+      if (content && !reduced) {
+        // translateX is a percentage of the content's own width (= one
+        // viewport) rather than 100vw, so a visible scrollbar can't skew it.
+        content.style.transform =
+          p < 1
+            ? `translate3d(${((1 - p) * 100).toFixed(3)}%, ${(
+                window.scrollY - runway
+              ).toFixed(2)}px, 0)`
+            : "";
+      }
       ticking = false;
     };
     const onScroll = () => {

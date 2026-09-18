@@ -159,15 +159,21 @@ body {
 /* Hero foreground layers fade out on scroll; background stays put (driven by JS) */
 .topbar, .hero__center, .hero__footer { will-change: opacity; }
 
-/* ---- Hero overlap: the content slides up OVER the pinned hero ----
-   `.hero-runway` is two viewports tall, so the sticky hero stays pinned for
-   the first viewport of scrolling. `.content` is pulled up one viewport with
-   a negative margin, so its top starts just below the fold and rises over the
-   still hero as you scroll, like a sheet laid on top. The hero dims a little
-   as it's covered (`--hero-exit`, 0→1, set by hero.tsx) so the rising edge
-   reads as depth.
+/* ---- Hero overlap: the content slides in from the right OVER the hero ----
+   For the first viewport of scrolling nothing travels vertically. The hero
+   stays pinned while the content slides across it from the right, scrubbed
+   by `--hero-exit` (0→1, set by hero.tsx). The hero dims a little as it's
+   covered so the incoming edge reads as depth.
 
-   Reduced-motion users get a plain scroll: without the media query the runway
+   How the vertical hold works: `.hero-runway` is two viewports tall, so the
+   sticky hero stays pinned through the whole slide. `.content` is pulled up
+   one viewport with a negative margin, putting its natural top exactly at
+   scrollY = 100dvh — the moment the slide ends. Until then hero.tsx cancels
+   the remaining offset with a matching translateY, so the content sits level
+   with the top of the screen and only its X changes. At the end both offsets
+   reach zero together, so normal vertical scrolling resumes with no jump.
+
+   Reduced-motion users get none of this: without the media query the runway
    is just the hero's own height and the content keeps its normal position. */
 :root { --hero-exit: 0; }
 
@@ -177,8 +183,10 @@ body {
   .hero-runway { height: 200dvh; }
   .content {
     margin-top: -100dvh;
-    /* Soft shadow on the leading edge so the sheet reads as lying on top. */
-    box-shadow: 0 -24px 60px rgba(0, 0, 0, 0.35);
+    will-change: transform;
+    /* Soft shadow on the leading (left) edge so the sheet reads as lying on
+       top of the hero. */
+    box-shadow: -24px 0 60px rgba(0, 0, 0, 0.35);
   }
   .hero { opacity: calc(1 - var(--hero-exit) * 0.45); }
 }
