@@ -84,8 +84,8 @@ export const PROJECTS: Project[] = [
     poster: "/assets/tinker-poster.jpg",
   },
   {
-    key: "footing",
-    name: "Footing",
+    key: "financial-planner",
+    name: "Financial Planner",
     meta: "Web App",
     blurb: "Your retirement accounts and what to do next, in plain English.",
     description:
@@ -93,7 +93,7 @@ export const PROJECTS: Project[] = [
     href: "https://ethanmiclat.github.io/financialplanner/",
     linkLabel: "Visit Site",
     note: "Demo only — you get a sample student's plan in a private sandbox that clears after a day. Not financial advice, and please don't enter real personal information.",
-    video: "/assets/footing.mp4",
-    poster: "/assets/footing-poster.jpg",
+    video: "/assets/financial-planner.mp4",
+    poster: "/assets/financial-planner-poster.jpg",
   },
 ];
