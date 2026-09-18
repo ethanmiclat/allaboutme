@@ -96,4 +96,13 @@ export const PROJECTS: Project[] = [
     video: "/assets/financial-planner.mp4",
     poster: "/assets/financial-planner-poster.jpg",
   },
+  {
+    key: "this-site",
+    name: "This Site!",
+    meta: "Portfolio",
+    blurb: "A personal portfolio built from scratch with Next.js.",
+    description:
+      "This portfolio — the folder you're clicking through, the smooth scroll, the hero, all of it. Built with Next.js and TypeScript, styled with hand-written CSS, and animated with GSAP for the scroll-driven layout and transitions throughout.",
+    tagline: "You're already here.",
+  },
 ];
